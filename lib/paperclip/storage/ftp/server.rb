@@ -4,7 +4,14 @@ module Paperclip
   module Storage
     module Ftp
       class Server
+        attr_accessor :host, :user, :password
         attr_accessor :connection
+
+        def initialize(options = {})
+          options.each do |k,v|
+            send("#{k}=", v)
+          end
+        end
 
         def file_exists?(path)
           pathname = Pathname.new(path)

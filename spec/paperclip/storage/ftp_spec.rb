@@ -60,7 +60,28 @@ describe Paperclip::Storage::Ftp do
     end
   end
 
-  context "#flush_writes"
-  context "#flush_deletes"
-  context "#primary_ftp_server"
+  context "#flush_writes" do
+    it "stores the files on every server"
+  end
+
+  context "#flush_deletes" do
+    it "deletes the files on every server"
+  end
+
+  context "#ftp_servers" do
+    it "returns the configured ftp servers" do
+      attachment.ftp_servers.first.host.should      == "ftp1.example.com"
+      attachment.ftp_servers.first.user.should      == "user1"
+      attachment.ftp_servers.first.password.should  == "password1"
+      attachment.ftp_servers.second.host.should     == "ftp2.example.com"
+      attachment.ftp_servers.second.user.should     == "user2"
+      attachment.ftp_servers.second.password.should == "password2"
+    end
+  end
+
+  context "#primary_ftp_server" do
+    it "returns the first server in the list" do
+      attachment.primary_ftp_server.should == attachment.ftp_servers.first
+    end
+  end
 end

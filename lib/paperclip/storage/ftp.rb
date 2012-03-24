@@ -22,8 +22,23 @@ module Paperclip
         end
       end
 
+      def ftp_servers
+        @ftp_servers ||= begin
+          ftp_servers = []
+          @options[:ftp_servers].each do |config|
+            server = Server.new(
+              :host     => config[:host],
+              :user     => config[:user],
+              :password => config[:password]
+            )
+            ftp_servers << server
+          end
+          ftp_servers
+        end
+      end
+
       def primary_ftp_server
-        @primary_ftp_server ||= Server.new
+        ftp_servers.first
       end
     end
   end
