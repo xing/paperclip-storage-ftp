@@ -61,7 +61,27 @@ describe Paperclip::Storage::Ftp do
   end
 
   context "#flush_writes" do
-    it "stores the files on every server"
+    it "stores the files on every server" do
+      original_file = double("original_file")
+      thumb_file    = double("thumb_file")
+
+      attachment.instance_variable_set(:@queued_for_write, {
+        :original => original_file,
+        :thumb    => thumb_file
+      })
+
+      thumb_file.should_receive(:close)
+      original_file.should_receive(:close)
+      attachment.ftp_servers.first.should_receive(:put_file).with(original_file, "/files/original/foo.jpg")
+      attachment.ftp_servers.first.should_receive(:put_file).with(thumb_file, "/files/thumb/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:put_file).with(original_file, "/files/original/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:put_file).with(thumb_file, "/files/thumb/foo.jpg")
+      attachment.should_receive(:after_flush_writes)
+
+      attachment.flush_writes
+
+      attachment.queued_for_write.should == {}
+    end
   end
 
   context "#flush_deletes" do

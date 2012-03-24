@@ -4,3 +4,5 @@ RSpec.configure do |config|
 end
 
 require "paperclip/storage/ftp"
+
+Paperclip.options[:log] = false

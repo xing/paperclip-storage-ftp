@@ -22,6 +22,20 @@ module Paperclip
         end
       end
 
+      def flush_writes #:nodoc:
+        @queued_for_write.each do |style_name, file|
+          file.close
+          ftp_servers.each do |server|
+            log("saving #{path(style_name)} on #{server.host}")
+            server.put_file(file, path(style_name))
+          end
+        end
+
+        after_flush_writes # allows attachment to clean up temp files
+
+        @queued_for_write = {}
+      end
+
       def ftp_servers
         @ftp_servers ||= begin
           ftp_servers = []

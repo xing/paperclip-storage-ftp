@@ -32,5 +32,11 @@ describe Paperclip::Storage::Ftp::Server do
   end
 
   context "#get_file"
+
+  context "#put_file" do
+    it "stores the file on the server"
+    it "creates the directory if needed"
+  end
+
   context "#connection"
 end
