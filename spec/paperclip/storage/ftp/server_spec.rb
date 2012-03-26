@@ -38,5 +38,9 @@ describe Paperclip::Storage::Ftp::Server do
     it "creates the directory if needed"
   end
 
+  context "#delete_file" do
+    it "deletes the file on the server"
+  end
+
   context "#connection"
 end

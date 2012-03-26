@@ -85,7 +85,17 @@ describe Paperclip::Storage::Ftp do
   end
 
   context "#flush_deletes" do
-    it "deletes the files on every server"
+    it "deletes the files on every server" do
+      attachment.instance_variable_set(:@queued_for_delete, [
+        "/files/original/foo.jpg",
+        "/files/thumb/foo.jpg"
+      ])
+      attachment.ftp_servers.first.should_receive(:delete_file).with("/files/original/foo.jpg")
+      attachment.ftp_servers.first.should_receive(:delete_file).with("/files/thumb/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:delete_file).with("/files/original/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:delete_file).with("/files/thumb/foo.jpg")
+      attachment.flush_deletes
+    end
   end
 
   context "#ftp_servers" do

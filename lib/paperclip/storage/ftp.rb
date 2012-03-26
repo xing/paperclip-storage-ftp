@@ -36,6 +36,15 @@ module Paperclip
         @queued_for_write = {}
       end
 
+      def flush_deletes
+        @queued_for_delete.each do |path|
+          ftp_servers.each do |server|
+            log("deleting #{path} on #{server.host}")
+            server.delete_file(path)
+          end
+        end
+      end
+
       def ftp_servers
         @ftp_servers ||= begin
           ftp_servers = []
