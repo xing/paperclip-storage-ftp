@@ -31,7 +31,13 @@ describe Paperclip::Storage::Ftp::Server do
     end
   end
 
-  context "#get_file"
+  context "#get_file" do
+    it "returns the file object" do
+      server.connection = double("connection")
+      server.connection.should_receive(:getbinaryfile).with("/files/original", "/tmp/foo")
+      server.get_file("/files/original", "/tmp/foo")
+    end
+  end
 
   context "#put_file" do
     it "stores the file on the server"

@@ -18,9 +18,9 @@ module Paperclip
           connection.nlst(pathname.dirname.to_s).include?(pathname.basename.to_s)
         end
 
-        # def get_file(path)
-        #   File.new(path(style_name), 'rb')
-        # end
+        def get_file(path, tempfile_path)
+          connection.getbinaryfile(path, tempfile_path)
+        end
       end
     end
   end
