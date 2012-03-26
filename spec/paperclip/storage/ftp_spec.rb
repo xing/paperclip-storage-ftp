@@ -94,7 +94,10 @@ describe Paperclip::Storage::Ftp do
       attachment.ftp_servers.first.should_receive(:delete_file).with("/files/thumb/foo.jpg")
       attachment.ftp_servers.second.should_receive(:delete_file).with("/files/original/foo.jpg")
       attachment.ftp_servers.second.should_receive(:delete_file).with("/files/thumb/foo.jpg")
+
       attachment.flush_deletes
+
+      attachment.instance_variable_get(:@queued_for_delete).should == []
     end
   end
 

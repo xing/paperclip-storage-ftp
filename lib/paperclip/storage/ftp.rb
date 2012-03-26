@@ -43,6 +43,7 @@ module Paperclip
             server.delete_file(path)
           end
         end
+        @queued_for_delete = []
       end
 
       def ftp_servers
