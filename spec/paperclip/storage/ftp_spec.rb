@@ -70,13 +70,13 @@ describe Paperclip::Storage::Ftp do
         :thumb    => thumb_file
       })
 
-      thumb_file.should_receive(:close)
-      original_file.should_receive(:close)
+      thumb_file.should_receive(:close).with(no_args)
+      original_file.should_receive(:close).with(no_args)
       attachment.ftp_servers.first.should_receive(:put_file).with(original_file, "/files/original/foo.jpg")
       attachment.ftp_servers.first.should_receive(:put_file).with(thumb_file, "/files/thumb/foo.jpg")
       attachment.ftp_servers.second.should_receive(:put_file).with(original_file, "/files/original/foo.jpg")
       attachment.ftp_servers.second.should_receive(:put_file).with(thumb_file, "/files/thumb/foo.jpg")
-      attachment.should_receive(:after_flush_writes)
+      attachment.should_receive(:after_flush_writes).with(no_args)
 
       attachment.flush_writes
 
