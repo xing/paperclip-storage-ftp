@@ -27,6 +27,10 @@ module Paperclip
           connection.mkdir(pathname.dirname.to_s)
           connection.putbinaryfile(local_file_path, remote_file_path)
         end
+
+        def delete_file(remote_file_path)
+          connection.delete(remote_file_path)
+        end
       end
     end
   end

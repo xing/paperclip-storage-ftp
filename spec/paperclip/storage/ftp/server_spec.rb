@@ -49,7 +49,11 @@ describe Paperclip::Storage::Ftp::Server do
   end
 
   context "#delete_file" do
-    it "deletes the file on the server"
+    it "deletes the file on the server" do
+      server.connection = double("connection")
+      server.connection.should_receive(:delete).with("/files/original.jpg")
+      server.delete_file("/files/original.jpg")
+    end
   end
 
   context "#connection"
