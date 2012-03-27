@@ -56,5 +56,15 @@ describe Paperclip::Storage::Ftp::Server do
     end
   end
 
-  context "#connection"
+  context "#connection" do
+    it "returns a memoized ftp connection to the given server" do
+      server.host     = "ftp.example.com"
+      server.user     = "user"
+      server.password = "password"
+
+      Net::FTP.should_receive(:open).with(server.host, server.user, server.password).once.and_return(:foo)
+
+      2.times { server.connection.should == :foo }
+    end
+  end
 end

@@ -1,11 +1,12 @@
 require "pathname"
+require "net/ftp"
 
 module Paperclip
   module Storage
     module Ftp
       class Server
         attr_accessor :host, :user, :password
-        attr_accessor :connection
+        attr_writer   :connection
 
         def initialize(options = {})
           options.each do |k,v|
@@ -30,6 +31,10 @@ module Paperclip
 
         def delete_file(remote_file_path)
           connection.delete(remote_file_path)
+        end
+
+        def connection
+          @connection ||= Net::FTP.open(host, user, password)
         end
       end
     end
