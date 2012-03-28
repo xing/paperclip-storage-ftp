@@ -42,14 +42,22 @@ describe Paperclip::Storage::Ftp do
   end
 
   context "#to_file" do
-    it "gets the file from the primary server" do
-      attachment.primary_ftp_server.should_receive(:get_file).with("/files/original/foo.jpg").and_return(:foo)
-      attachment.to_file.should == :foo
+    it "returns the file from the primary server as a local tempfile" do
+      tempfile = double("tempfile")
+      tempfile.should_receive(:path).and_return("/tmp/foo")
+      tempfile.should_receive(:rewind).with(no_args)
+      Tempfile.should_receive(:new).with(["foo", ".jpg"]).and_return(tempfile)
+      attachment.primary_ftp_server.should_receive(:get_file).with("/files/original/foo.jpg", "/tmp/foo").and_return(:foo)
+      attachment.to_file.should == tempfile
     end
 
     it "accepts an optional style_name parameter to build the correct file path" do
-      attachment.primary_ftp_server.should_receive(:get_file).with("/files/thumb/foo.jpg").and_return(:foo)
-      attachment.to_file(:thumb).should == :foo
+      tempfile = double("tempfile")
+      tempfile.should_receive(:path).and_return("/tmp/foo")
+      tempfile.should_receive(:rewind).with(no_args)
+      Tempfile.should_receive(:new).with(["foo", ".jpg"]).and_return(tempfile)
+      attachment.primary_ftp_server.should_receive(:get_file).with("/files/thumb/foo.jpg", anything)
+      attachment.to_file(:thumb)
     end
 
     it "gets an existing file object from the local write queue, if available" do

@@ -1,5 +1,7 @@
 require "paperclip"
 require "active_support/all"
+require "tempfile"
+
 require "paperclip/storage/ftp/server"
 
 module Paperclip
@@ -18,7 +20,13 @@ module Paperclip
           @queued_for_write[style_name].rewind
           @queued_for_write[style_name]
         else
-          primary_ftp_server.get_file(path(style_name))
+          filename = path(style_name)
+          extname  = File.extname(filename)
+          basename = File.basename(filename, extname)
+          file     = Tempfile.new([basename, extname])
+          primary_ftp_server.get_file(filename, file.path)
+          file.rewind
+          file
         end
       end
 
