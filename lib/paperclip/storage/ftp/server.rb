@@ -25,7 +25,7 @@ module Paperclip
 
         def put_file(local_file_path, remote_file_path)
           pathname = Pathname.new(remote_file_path)
-          connection.mkdir(pathname.dirname.to_s)
+          mkdir_p(pathname.dirname.to_s)
           connection.putbinaryfile(local_file_path, remote_file_path)
         end
 
@@ -35,6 +35,18 @@ module Paperclip
 
         def connection
           @connection ||= Net::FTP.open(host, user, password)
+        end
+
+        def mkdir_p(dirname)
+          pathname = Pathname.new(dirname)
+          pathname.descend do |p|
+            begin
+              connection.mkdir(p.to_s)
+            rescue Net::FTPPermError
+              # This error can be caused by an existing directory.
+              # Ignore, and keep on trying to create child directories.
+            end
+          end
         end
       end
     end

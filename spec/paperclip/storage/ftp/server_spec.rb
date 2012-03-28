@@ -42,7 +42,7 @@ describe Paperclip::Storage::Ftp::Server do
   context "#put_file" do
     it "stores the file on the server" do
       server.connection = double("connection")
-      server.connection.should_receive(:mkdir).with("/files")
+      server.should_receive(:mkdir_p).with("/files")
       server.connection.should_receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
       server.put_file("/tmp/original.jpg", "/files/original.jpg")
     end
@@ -65,6 +65,24 @@ describe Paperclip::Storage::Ftp::Server do
       Net::FTP.should_receive(:open).with(server.host, server.user, server.password).once.and_return(:foo)
 
       2.times { server.connection.should == :foo }
+    end
+  end
+
+  context "mkdir_p" do
+    it "creates the directory and all its parent directories" do
+      server.connection = double("connection")
+      server.connection.should_receive(:mkdir).with("/").ordered
+      server.connection.should_receive(:mkdir).with("/files").ordered
+      server.connection.should_receive(:mkdir).with("/files/foo").ordered
+      server.connection.should_receive(:mkdir).with("/files/foo/bar").ordered
+      server.mkdir_p("/files/foo/bar")
+    end
+
+    it "does not stop on Net::FTPPermError" do
+      server.connection = double("connection")
+      server.connection.should_receive(:mkdir).with("/").and_raise(Net::FTPPermError)
+      server.connection.should_receive(:mkdir).with("/files")
+      server.mkdir_p("/files")
     end
   end
 end
