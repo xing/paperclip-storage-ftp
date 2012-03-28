@@ -26,8 +26,9 @@ module Paperclip
         @queued_for_write.each do |style_name, file|
           file.close
           ftp_servers.each do |server|
-            log("saving #{path(style_name)} on #{server.host}")
-            server.put_file(file, path(style_name))
+            path = path(style_name)
+            log("saving ftp://#{server.user}@#{server.host}:#{path}")
+            server.put_file(file, path)
           end
         end
 
@@ -39,7 +40,7 @@ module Paperclip
       def flush_deletes
         @queued_for_delete.each do |path|
           ftp_servers.each do |server|
-            log("deleting #{path} on #{server.host}")
+            log("deleting ftp://#{server.user}@#{server.host}:#{path}")
             server.delete_file(path)
           end
         end
