@@ -34,9 +34,9 @@ module Paperclip
         @queued_for_write.each do |style_name, file|
           file.close
           ftp_servers.each do |server|
-            path = path(style_name)
-            log("saving ftp://#{server.user}@#{server.host}:#{path}")
-            server.put_file(file, path)
+            remote_path = path(style_name)
+            log("saving ftp://#{server.user}@#{server.host}:#{remote_path}")
+            server.put_file(file.path, remote_path)
           end
         end
 

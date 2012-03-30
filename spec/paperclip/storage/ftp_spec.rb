@@ -70,8 +70,8 @@ describe Paperclip::Storage::Ftp do
 
   context "#flush_writes" do
     it "stores the files on every server" do
-      original_file = double("original_file")
-      thumb_file    = double("thumb_file")
+      original_file = double("original_file", :path => "/tmp/original/foo.jpg")
+      thumb_file    = double("thumb_file",    :path => "/tmp/thumb/foo.jpg")
 
       attachment.instance_variable_set(:@queued_for_write, {
         :original => original_file,
@@ -80,10 +80,10 @@ describe Paperclip::Storage::Ftp do
 
       thumb_file.should_receive(:close).with(no_args)
       original_file.should_receive(:close).with(no_args)
-      attachment.ftp_servers.first.should_receive(:put_file).with(original_file, "/files/original/foo.jpg")
-      attachment.ftp_servers.first.should_receive(:put_file).with(thumb_file, "/files/thumb/foo.jpg")
-      attachment.ftp_servers.second.should_receive(:put_file).with(original_file, "/files/original/foo.jpg")
-      attachment.ftp_servers.second.should_receive(:put_file).with(thumb_file, "/files/thumb/foo.jpg")
+      attachment.ftp_servers.first.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
+      attachment.ftp_servers.first.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
       attachment.should_receive(:after_flush_writes).with(no_args)
 
       attachment.flush_writes
