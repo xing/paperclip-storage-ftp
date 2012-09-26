@@ -3,6 +3,10 @@
 Allow [Paperclip](https://github.com/thoughtbot/paperclip) attachments
 to be stored on FTP servers.
 
+## Build status
+
+[![Build Status](https://secure.travis-ci.org/xing/paperclip-storage-ftp.png)](http://travis-ci.org/xing/paperclip-storage-ftp)
+
 ## Installation
 
 Add this line to your application's Gemfile:
