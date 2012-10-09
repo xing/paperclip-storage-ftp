@@ -55,6 +55,10 @@ module Paperclip
         @queued_for_delete = []
       end
 
+      def copy_to_local_file(style, destination_path)
+        primary_ftp_server.get_file(path(style), destination_path)
+      end
+
       def ftp_servers
         @ftp_servers ||= begin
           ftp_servers = []
