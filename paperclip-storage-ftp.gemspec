@@ -17,4 +17,7 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency("rspec")
   gem.add_development_dependency("rake")
+  gem.add_development_dependency("daemon_controller")
+  gem.add_development_dependency("activerecord")
+  gem.add_development_dependency("sqlite3")
 end
