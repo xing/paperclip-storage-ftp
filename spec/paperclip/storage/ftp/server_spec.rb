@@ -1,4 +1,4 @@
-require File.expand_path("../../../../spec_helper", __FILE__)
+require "spec_helper"
 
 describe Paperclip::Storage::Ftp::Server do
   let(:server) { Paperclip::Storage::Ftp::Server.new }
@@ -8,12 +8,19 @@ describe Paperclip::Storage::Ftp::Server do
       options = {
         :host     => "ftp.example.com",
         :user     => "user",
-        :password => "password"
+        :password => "password",
+        :port     => 2121
       }
       server = Paperclip::Storage::Ftp::Server.new(options)
-      server.host.should     == "ftp.example.com"
-      server.user.should     == "user"
-      server.password.should == "password"
+      server.host.should     == options[:host]
+      server.user.should     == options[:user]
+      server.password.should == options[:password]
+      server.port.should     == options[:port]
+    end
+
+    it "sets a default port" do
+      server = Paperclip::Storage::Ftp::Server.new
+      server.port.should == Net::FTP::FTP_PORT
     end
   end
 
@@ -62,9 +69,12 @@ describe Paperclip::Storage::Ftp::Server do
       server.user     = "user"
       server.password = "password"
 
-      Net::FTP.should_receive(:open).with(server.host, server.user, server.password).once.and_return(:foo)
+      connection = double("connection")
+      Net::FTP.should_receive(:new).once.and_return(connection)
+      connection.should_receive(:connect).once.with(server.host, server.port)
+      connection.should_receive(:login).once.with(server.user, server.password)
 
-      2.times { server.connection.should == :foo }
+      2.times { server.connection.should == connection }
     end
   end
 
