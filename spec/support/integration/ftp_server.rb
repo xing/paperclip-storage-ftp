@@ -3,13 +3,14 @@ require "daemon_controller"
 class FtpServer
 
   INSTALL_PATH = File.expand_path("../../../../vendor/apache-ftpserver", __FILE__)
+  HOME_PATH    = INSTALL_PATH + "/res/home"
 
   def self.start
-    daemon_controller.start
+    daemon_controller.start unless daemon_controller.running?
   end
 
-  def self.stop
-    daemon_controller.stop
+  def self.clear
+    FileUtils.rm_r(Dir.glob(HOME_PATH + "/*"))
   end
 
   private
