@@ -17,3 +17,6 @@ test/version_tmp
 tmp
 .rspec
 .rvmrc
+vendor/apache-ftpserver/res/ftpd.pid*
+vendor/apache-ftpserver/res/home/*
+vendor/apache-ftpserver/res/log/*

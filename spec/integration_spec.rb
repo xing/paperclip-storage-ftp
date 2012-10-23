@@ -4,10 +4,10 @@ require "support/integration/ftp_server"
 require "support/integration/user"
 
 describe "Integration" do
-  before { FtpServer.instance.start }
-  after  { FtpServer.instance.stop }
+  before { FtpServer.start }
+  after  { FtpServer.stop }
 
-  it "saves the attachment" do
+  it "stores the attachment on the ftp server" do
     user = User.new
     # user.avatar =
     user.save!
