@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.homepage      = "https://github.com/xing/paperclip-storage-ftp"
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  gem.files         = `git ls-files`.split("\n")
+  gem.files         = `git ls-files -- lib spec LICENSE Gemfile paperclip-storage-ftp.gemspec Rakefile README.md`.split("\n")
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.name          = "paperclip-storage-ftp"
   gem.require_paths = ["lib"]
@@ -17,6 +17,4 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency("rspec")
   gem.add_development_dependency("rake")
-  gem.add_development_dependency("daemon_controller")
-  gem.add_development_dependency("activerecord")
 end
