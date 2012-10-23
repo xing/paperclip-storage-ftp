@@ -48,7 +48,8 @@ In your model:
           {
             :host     => "ftp1.example.com",
             :user     => "foo",
-            :password => "bar"
+            :password => "bar",
+            :port     => 21 # optional
           },
           # Add more servers if needed
           {

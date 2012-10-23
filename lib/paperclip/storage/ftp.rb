@@ -62,7 +62,8 @@ module Paperclip
             server = Server.new(
               :host     => config[:host],
               :user     => config[:user],
-              :password => config[:password]
+              :password => config[:password],
+              :port     => config[:port]
             )
             ftp_servers << server
           end
