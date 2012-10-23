@@ -1,11 +1,9 @@
 require "spec_helper"
 
-require "support/integration/ftp_server"
-require "support/integration/user"
-
-describe "Integration" do
-
+describe "Integration", :integration => true do
   before do
+    require "support/integration/ftp_server"
+    require "support/integration/user"
     FtpServer.clear
     FtpServer.start
   end
