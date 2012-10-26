@@ -109,6 +109,18 @@ describe Paperclip::Storage::Ftp do
     end
   end
 
+  context "#copy_to_local_file" do
+    it "returns the file from the primary server and stores it in the path specified" do
+      attachment.primary_ftp_server.should_receive(:get_file).with("/files/original/foo.jpg", "/local/foo").and_return(:foo)
+      attachment.copy_to_local_file(:original, "/local/foo")
+    end
+
+    it "accepts the style parameter to build the correct path" do
+      attachment.primary_ftp_server.should_receive(:get_file).with("/files/thumb/foo.jpg", "/local/thumb/foo").and_return(:foo)
+      attachment.copy_to_local_file(:thumb, "/local/thumb/foo")
+    end
+  end
+
   context "#ftp_servers" do
     it "returns the configured ftp servers" do
       attachment.ftp_servers.first.host.should      == "ftp1.example.com"
