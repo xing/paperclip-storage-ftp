@@ -19,7 +19,7 @@ describe Paperclip::Storage::Ftp::Server do
     end
 
     it "sets a default port" do
-      server = Paperclip::Storage::Ftp::Server.new
+      server = Paperclip::Storage::Ftp::Server.new(:port => nil)
       server.port.should == Net::FTP::FTP_PORT
     end
   end
