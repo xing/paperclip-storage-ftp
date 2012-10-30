@@ -31,6 +31,12 @@ describe Paperclip::Storage::Ftp::Server do
       server.file_exists?("/files/original/foo.jpg").should be_true
     end
 
+    it "recognizes complete file paths correctly" do
+      server.connection = double("connection")
+      server.connection.should_receive(:nlst).with("/files/original").and_return(["/files/original/foo.jpg"])
+      server.file_exists?("/files/original/foo.jpg").should be_true
+    end
+
     it "returns false if the file does not exist on the server" do
       server.connection = double("connection")
       server.connection.should_receive(:nlst).with("/files/original").and_return([])
