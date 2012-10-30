@@ -6,8 +6,8 @@ module Paperclip
     module Ftp
       class Server
 
-        attr_accessor :host, :user, :password, :port
-        attr_writer   :connection
+        attr_accessor :host, :user, :password
+        attr_writer   :connection, :port
 
         def self.default_options
           {
@@ -48,6 +48,10 @@ module Paperclip
             connection.login(user, password)
             connection
           end
+        end
+
+        def port
+          @port || Net::FTP::FTP_PORT
         end
 
         def mkdir_p(dirname)
