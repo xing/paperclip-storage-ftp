@@ -11,7 +11,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.name          = "paperclip-storage-ftp"
   gem.require_paths = ["lib"]
-  gem.version       = "1.0.0.rc2"
+  gem.version       = "1.0.0.rc3"
 
   gem.add_dependency("paperclip")
 
