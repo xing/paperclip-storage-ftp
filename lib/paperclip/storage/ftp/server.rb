@@ -9,14 +9,7 @@ module Paperclip
         attr_accessor :host, :user, :password
         attr_writer   :connection, :port
 
-        def self.default_options
-          {
-            :port => Net::FTP::FTP_PORT
-          }
-        end
-
         def initialize(options = {})
-          options = self.class.default_options.merge(options)
           options.each do |k,v|
             send("#{k}=", v)
           end
