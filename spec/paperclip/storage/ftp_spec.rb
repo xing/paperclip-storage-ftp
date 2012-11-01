@@ -80,10 +80,10 @@ describe Paperclip::Storage::Ftp do
 
       thumb_file.should_receive(:close).with(no_args)
       original_file.should_receive(:close).with(no_args)
-      attachment.ftp_servers[0].should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
-      attachment.ftp_servers[0].should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
-      attachment.ftp_servers[1].should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
-      attachment.ftp_servers[1].should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
+      attachment.ftp_servers.first.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
+      attachment.ftp_servers.first.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
       attachment.should_receive(:after_flush_writes).with(no_args)
 
       attachment.flush_writes
@@ -98,10 +98,10 @@ describe Paperclip::Storage::Ftp do
         "/files/original/foo.jpg",
         "/files/thumb/foo.jpg"
       ])
-      attachment.ftp_servers[0].should_receive(:delete_file).with("/files/original/foo.jpg")
-      attachment.ftp_servers[0].should_receive(:delete_file).with("/files/thumb/foo.jpg")
-      attachment.ftp_servers[1].should_receive(:delete_file).with("/files/original/foo.jpg")
-      attachment.ftp_servers[1].should_receive(:delete_file).with("/files/thumb/foo.jpg")
+      attachment.ftp_servers.first.should_receive(:delete_file).with("/files/original/foo.jpg")
+      attachment.ftp_servers.first.should_receive(:delete_file).with("/files/thumb/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:delete_file).with("/files/original/foo.jpg")
+      attachment.ftp_servers.second.should_receive(:delete_file).with("/files/thumb/foo.jpg")
 
       attachment.flush_deletes
 
@@ -123,12 +123,12 @@ describe Paperclip::Storage::Ftp do
 
   context "#ftp_servers" do
     it "returns the configured ftp servers" do
-      attachment.ftp_servers[0].host.should     == "ftp1.example.com"
-      attachment.ftp_servers[0].user.should     == "user1"
-      attachment.ftp_servers[0].password.should == "password1"
-      attachment.ftp_servers[1].host.should     == "ftp2.example.com"
-      attachment.ftp_servers[1].user.should     == "user2"
-      attachment.ftp_servers[1].password.should == "password2"
+      attachment.ftp_servers.first.host.should      == "ftp1.example.com"
+      attachment.ftp_servers.first.user.should      == "user1"
+      attachment.ftp_servers.first.password.should  == "password1"
+      attachment.ftp_servers.second.host.should     == "ftp2.example.com"
+      attachment.ftp_servers.second.user.should     == "user2"
+      attachment.ftp_servers.second.password.should == "password2"
     end
   end
 
