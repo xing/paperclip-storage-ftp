@@ -55,7 +55,8 @@ In your model:
           {
             :host     => "ftp2.example.com",
             :user     => "foo",
-            :password => "bar"
+            :password => "bar",
+            :port     => 2121
           }
         ]
     end
