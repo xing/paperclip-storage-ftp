@@ -6,8 +6,14 @@ module Paperclip
     module Ftp
       class Server
 
+        @@connections = {}
+
+        def self.clear_connections
+          @@connections.clear
+        end
+
         attr_accessor :host, :user, :password
-        attr_writer   :connection, :port
+        attr_writer   :port
 
         def initialize(options = {})
           options.each do |k,v|
@@ -35,12 +41,19 @@ module Paperclip
         end
 
         def connection
-          @connection ||= begin
-            connection = Net::FTP.new
+          connection = @@connections["#{host}:#{port}"] ||= build_connection
+          if connection.closed?
             connection.connect(host, port)
             connection.login(user, password)
-            connection
           end
+          connection
+        end
+
+        def build_connection
+          connection = Net::FTP.new
+          connection.connect(host, port)
+          connection.login(user, password)
+          connection
         end
 
         def port
