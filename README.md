@@ -68,3 +68,15 @@ In your model:
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Authors
+
+* [Sebastian Röbke](https://github.com/boosty)
+* and other friendly [contributors](https://github.com/xing/paperclip-storage-ftp/graphs/contributors)
+
+You can find out more about our work on our [dev blog](http://devblog.xing.com).
+
+Copyright (c) 2012 [XING AG](http://www.xing.com)
+
+Released under the MIT license. For full details see [LICENSE](https://github.com/xing/paperclip-storage-ftp/blob/master/LICENSE)
+included in this distribution.
