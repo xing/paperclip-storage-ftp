@@ -1,5 +1,4 @@
 require "paperclip"
-require "active_support/all"
 require "tempfile"
 
 require "paperclip/storage/ftp/server"
@@ -76,7 +75,7 @@ module Paperclip
       end
 
       def primary_ftp_server
-        ftp_servers.first
+        ftp_servers[0]
       end
     end
   end
