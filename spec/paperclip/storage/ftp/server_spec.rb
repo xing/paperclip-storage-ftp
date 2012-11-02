@@ -83,59 +83,23 @@ describe Paperclip::Storage::Ftp::Server do
     end
   end
 
-  context "#build_connection" do
-    it "returns the ftp connection for the given server" do
-      server.host     = "ftp.example.com"
-      server.user     = "user"
-      server.password = "password"
-
-      ftp = double("ftp")
-      Net::FTP.should_receive(:new).and_return(ftp)
-      ftp.should_receive(:connect).with(server.host, server.port)
-      ftp.should_receive(:login).with(server.user, server.password)
-      server.build_connection.should == ftp
+  context "#connection" do
+    it "returns the reconnected connection for the given server (to avoid closed socket errors)" do
+      connection = double("connection")
+      server.should_receive(:build_connection).once.and_return(connection)
+      connection.should_receive(:close).twice
+      connection.should_receive(:connect).with(server.host, server.port).twice
+      connection.should_receive(:login).with(server.user, server.password).twice
+      2.times { server.connection.should == connection }
     end
   end
 
-  context "#connection" do
-    it "returns the memoized ftp connection for the given server" do
-      connection = double("connection", :closed? => false)
-      server.should_receive(:build_connection).once.and_return(connection)
-      server.connection.should == connection
-
-      # same host, same port => memoize
-      same_server = Paperclip::Storage::Ftp::Server.new(
-        :host => server.host,
-        :port => server.port
-      )
-      same_server.should_receive(:build_connection).never
-      same_server.connection.should == connection
-
-      # different host => do not memoize
-      other_host_connection = double("other_host_connection", :closed? => false)
-      other_host_server = Paperclip::Storage::Ftp::Server.new(
-        :host => "other.#{server.host}",
-        :port => server.port
-      )
-      other_host_server.should_receive(:build_connection).once.and_return(other_host_connection)
-      other_host_server.connection.should == other_host_connection
-
-      # different port => do not memoize
-      other_port_connection = double("other_port_connection", :closed? => false)
-      other_port_server = Paperclip::Storage::Ftp::Server.new(
-        :host => server.host,
-        :port => server.port + 1
-      )
-      other_port_server.should_receive(:build_connection).once.and_return(other_port_connection)
-      other_port_server.connection.should == other_port_connection
-    end
-
-    it "reconnects if the connection is closed" do
-      connection = double("connection", :closed? => true)
-      server.stub(:build_connection) { connection }
+  context "#build_connection" do
+    it "returns an ftp connection for the given server" do
+      connection = double("connection")
+      Net::FTP.should_receive(:new).and_return(connection)
       connection.should_receive(:connect).with(server.host, server.port)
-      connection.should_receive(:login).with(server.user, server.password)
-      server.connection.should == connection
+      server.build_connection.should == connection
     end
   end
 

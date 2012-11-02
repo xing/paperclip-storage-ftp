@@ -42,17 +42,15 @@ module Paperclip
 
         def connection
           connection = @@connections["#{host}:#{port}"] ||= build_connection
-          if connection.closed?
-            connection.connect(host, port)
-            connection.login(user, password)
-          end
+          connection.close
+          connection.connect(host, port)
+          connection.login(user, password)
           connection
         end
 
         def build_connection
           connection = Net::FTP.new
           connection.connect(host, port)
-          connection.login(user, password)
           connection
         end
 
