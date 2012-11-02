@@ -29,4 +29,21 @@ describe "Integration", :integration => true do
 
     File.exists?(FtpServer::HOME_PATH + "/#{user.id}/original/avatar.jpg").should be_false
   end
+
+  it "survives temporarily closed ftp connections" do
+    user = User.new
+    user.avatar = file
+    user.save!
+
+    user.avatar = nil
+    user.save!
+
+    FtpServer.restart
+
+    user.avatar = file
+    user.save!
+    file.close
+
+    File.exists?(FtpServer::HOME_PATH + "/#{user.id}/original/avatar.jpg").should be_true
+  end
 end

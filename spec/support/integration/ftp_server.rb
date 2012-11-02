@@ -9,6 +9,10 @@ class FtpServer
     daemon_controller.start unless daemon_controller.running?
   end
 
+  def self.restart
+    daemon_controller.restart
+  end
+
   def self.clear
     FileUtils.rm_r(Dir.glob(HOME_PATH + "/*"))
   end
