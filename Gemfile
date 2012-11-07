@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :integration_test do
-  gem "daemon_controller",  :platforms => :ruby
-  gem "activerecord",       :platforms => :ruby
-  gem "sqlite3",            :platforms => :ruby
+  gem "daemon_controller", ">= 1.1.0", :platforms => :ruby
+  gem "activerecord",                  :platforms => :ruby
+  gem "sqlite3",                       :platforms => :ruby
 end
