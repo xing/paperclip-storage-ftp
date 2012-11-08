@@ -20,3 +20,4 @@ tmp
 vendor/apache-ftpserver/res/ftpd.pid*
 vendor/apache-ftpserver/res/home/*
 vendor/apache-ftpserver/res/log/*
+.jrubyrc
