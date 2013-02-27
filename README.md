@@ -61,7 +61,8 @@ class User < ActiveRecord::Base
         :host     => "ftp2.example.com",
         :user     => "foo",
         :password => "bar",
-        :port     => 2121
+        :port     => 2121,
+        :passive  => true # false by default
       }
     ]
 end

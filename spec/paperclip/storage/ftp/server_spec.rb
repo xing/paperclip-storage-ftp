@@ -13,17 +13,19 @@ describe Paperclip::Storage::Ftp::Server do
         :host     => "ftp.example.com",
         :user     => "user",
         :password => "password",
-        :port     => 2121
+        :port     => 2121,
+        :passive  => true
       }
       server = Paperclip::Storage::Ftp::Server.new(options)
       server.host.should     == options[:host]
       server.user.should     == options[:user]
       server.password.should == options[:password]
       server.port.should     == options[:port]
+      server.passive.should  == options[:passive]
     end
 
     it "sets a default port" do
-      server = Paperclip::Storage::Ftp::Server.new(:port => nil)
+      server = Paperclip::Storage::Ftp::Server.new
       server.port.should == Net::FTP::FTP_PORT
     end
   end
@@ -98,6 +100,7 @@ describe Paperclip::Storage::Ftp::Server do
     it "returns an ftp connection for the given server" do
       connection = double("connection")
       Net::FTP.should_receive(:new).and_return(connection)
+      connection.should_receive(:passive=).with(server.passive)
       connection.should_receive(:connect).with(server.host, server.port)
       server.build_connection.should == connection
     end

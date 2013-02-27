@@ -12,7 +12,7 @@ module Paperclip
           @@connections.clear
         end
 
-        attr_accessor :host, :user, :password
+        attr_accessor :host, :user, :password, :passive
         attr_writer   :port
 
         def initialize(options = {})
@@ -50,6 +50,7 @@ module Paperclip
 
         def build_connection
           connection = Net::FTP.new
+          connection.passive = passive
           connection.connect(host, port)
           connection
         end
