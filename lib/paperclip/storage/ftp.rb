@@ -60,20 +60,7 @@ module Paperclip
       end
 
       def ftp_servers
-        @ftp_servers ||= begin
-          ftp_servers = []
-          @options[:ftp_servers].each do |config|
-            server = Server.new(
-              :host     => config[:host],
-              :user     => config[:user],
-              :password => config[:password],
-              :port     => config[:port],
-              :passive  => config[:passive]
-            )
-            ftp_servers << server
-          end
-          ftp_servers
-        end
+        @ftp_servers ||= @options[:ftp_servers].map{|config| Server.new(config) }
       end
 
       def primary_ftp_server
