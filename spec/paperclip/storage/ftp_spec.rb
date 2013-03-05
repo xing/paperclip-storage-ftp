@@ -13,12 +13,14 @@ describe Paperclip::Storage::Ftp do
         {
           :host     => "ftp1.example.com",
           :user     => "user1",
-          :password => "password1"
+          :password => "password1",
+          :port     => 2121
         },
         {
           :host     => "ftp2.example.com",
           :user     => "user2",
-          :password => "password2"
+          :password => "password2",
+          :passive  => true
         }
       ]
     })
@@ -126,9 +128,11 @@ describe Paperclip::Storage::Ftp do
       attachment.ftp_servers.first.host.should      == "ftp1.example.com"
       attachment.ftp_servers.first.user.should      == "user1"
       attachment.ftp_servers.first.password.should  == "password1"
+      attachment.ftp_servers.first.port.should      == 2121
       attachment.ftp_servers.second.host.should     == "ftp2.example.com"
       attachment.ftp_servers.second.user.should     == "user2"
       attachment.ftp_servers.second.password.should == "password2"
+      attachment.ftp_servers.second.passive.should  == true
     end
   end
 

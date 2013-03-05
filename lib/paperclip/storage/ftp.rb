@@ -67,7 +67,8 @@ module Paperclip
               :host     => config[:host],
               :user     => config[:user],
               :password => config[:password],
-              :port     => config[:port]
+              :port     => config[:port],
+              :passive  => config[:passive]
             )
             ftp_servers << server
           end
