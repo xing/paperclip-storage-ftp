@@ -53,16 +53,15 @@ class User < ActiveRecord::Base
       {
         :host     => "ftp1.example.com",
         :user     => "foo",
-        :password => "bar",
-        :port     => 21, # optional
+        :password => "bar"
       },
       # Add more servers if needed
       {
         :host     => "ftp2.example.com",
         :user     => "foo",
         :password => "bar",
-        :port     => 2121,
-        :passive  => true # false by default
+        :port     => 2121, # optional, 21 by default
+        :passive  => true  # optional, false by default
       }
     ]
 end
