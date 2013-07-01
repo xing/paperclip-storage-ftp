@@ -12,13 +12,15 @@ module Paperclip
           @@connections.clear
         end
 
-        attr_accessor :host, :user, :password, :passive
-        attr_writer   :port
+        attr_accessor :host, :user, :password, :port, :passive
 
         def initialize(options = {})
           options.each do |k,v|
             send("#{k}=", v)
           end
+
+          @port    = Net::FTP::FTP_PORT if @port.nil?
+          @passive = true if @passive.nil?
         end
 
         def file_exists?(path)
@@ -55,10 +57,6 @@ module Paperclip
           connection.passive = passive
           connection.connect(host, port)
           connection
-        end
-
-        def port
-          @port || Net::FTP::FTP_PORT
         end
 
         def mkdir_p(dirname)

@@ -14,7 +14,7 @@ describe Paperclip::Storage::Ftp::Server do
         :user     => "user",
         :password => "password",
         :port     => 2121,
-        :passive  => true
+        :passive  => false
       }
       server = Paperclip::Storage::Ftp::Server.new(options)
       server.host.should     == options[:host]
@@ -27,6 +27,11 @@ describe Paperclip::Storage::Ftp::Server do
     it "sets a default port" do
       server = Paperclip::Storage::Ftp::Server.new
       server.port.should == Net::FTP::FTP_PORT
+    end
+
+    it "sets passive to true by default" do
+      server = Paperclip::Storage::Ftp::Server.new
+      server.passive.should be_true
     end
   end
 
