@@ -6,3 +6,6 @@ end
 require "paperclip/storage/ftp"
 
 Paperclip.options[:log] = false
+
+# https://github.com/thoughtbot/cocaine#jruby-caveat
+Cocaine::CommandLine.runner = Cocaine::CommandLine::BackticksRunner.new

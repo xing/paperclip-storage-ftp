@@ -43,7 +43,7 @@ module Paperclip
         end
 
         def connection
-          connection = @@connections["#{host}:#{port}"] ||= build_connection
+          connection = @@connections["#{user}@#{host}:#{port}"] ||= build_connection
           connection.close
           connection.connect(host, port)
           connection.login(user, password)

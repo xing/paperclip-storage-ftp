@@ -27,14 +27,15 @@ module Paperclip
       end
 
       def flush_writes
-        @queued_for_write.each do |style_name, file|
-          file.close
-          ftp_servers.each do |server|
-            remote_path = path(style_name)
-            log("saving ftp://#{server.user}@#{server.host}:#{remote_path}")
-            server.put_file(file.path, remote_path)
+        ftp_servers.map do |server|
+          Thread.new do
+            @queued_for_write.each do |style_name, file|
+              remote_path = path(style_name)
+              log("saving ftp://#{server.user}@#{server.host}:#{remote_path}")
+              server.put_file(file.path, remote_path)
+            end
           end
-        end
+        end.each(&:join)
 
         after_flush_writes # allows attachment to clean up temp files
 
@@ -42,12 +43,15 @@ module Paperclip
       end
 
       def flush_deletes
-        @queued_for_delete.each do |path|
-          ftp_servers.each do |server|
-            log("deleting ftp://#{server.user}@#{server.host}:#{path}")
-            server.delete_file(path)
+        ftp_servers.map do |server|
+          Thread.new do
+            @queued_for_delete.each do |path|
+              log("deleting ftp://#{server.user}@#{server.host}:#{path}")
+              server.delete_file(path)
+            end
           end
-        end
+        end.each(&:join)
+
         @queued_for_delete = []
       end
 

@@ -19,12 +19,19 @@ class User < ActiveRecord::Base
 
   has_attached_file :avatar,
     :storage  => :ftp,
+    :styles   => { :medium => "50x50>", :thumb => "10x10>" },
     :path     => "/:id/:style/:filename",
     :ftp_servers => [
       {
         :host     => "127.0.0.1",
-        :user     => "admin",
-        :password => "admin",
+        :user     => "user1",
+        :password => "secret1",
+        :port     => 2121
+      },
+      {
+        :host     => "127.0.0.1",
+        :user     => "user2",
+        :password => "secret2",
         :port     => 2121
       }
     ]

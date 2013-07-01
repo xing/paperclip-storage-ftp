@@ -80,8 +80,6 @@ describe Paperclip::Storage::Ftp do
         :thumb    => thumb_file
       })
 
-      thumb_file.should_receive(:close).with(no_args)
-      original_file.should_receive(:close).with(no_args)
       attachment.ftp_servers.first.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
       attachment.ftp_servers.first.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
       attachment.ftp_servers.second.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
