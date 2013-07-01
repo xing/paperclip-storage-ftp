@@ -4,6 +4,7 @@
 .config
 .yardoc
 Gemfile.lock
+gemfiles/Gemfile.*.lock
 InstalledFiles
 _yardoc
 coverage
@@ -21,5 +22,7 @@ tmp
 .ruby-gemset
 vendor/apache-ftpserver/res/ftpd.pid*
 vendor/apache-ftpserver/res/home/*
+vendor/apache-ftpserver/res/user1/*
+vendor/apache-ftpserver/res/user2/*
 vendor/apache-ftpserver/res/log/*
 .jrubyrc
