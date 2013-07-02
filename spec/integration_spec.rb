@@ -1,11 +1,15 @@
 require "spec_helper"
 
 describe "paperclip-storage-ftp", :integration => true do
-  before do
+
+  before(:all) do
     require "support/integration/ftp_server"
     require "support/integration/user"
-    FtpServer.clear
     FtpServer.start
+  end
+
+  before(:each) do
+    FtpServer.clear
   end
 
   let(:file) { File.new(File.expand_path("../support/integration/avatar.jpg", __FILE__), "rb") }
