@@ -1,10 +1,6 @@
 require "spec_helper"
 
 describe Paperclip::Storage::Ftp::Server do
-  before(:each) do
-    Paperclip::Storage::Ftp::Server.clear_connections
-  end
-
   let(:server) { Paperclip::Storage::Ftp::Server.new }
 
   context "initialize" do
@@ -95,24 +91,15 @@ describe Paperclip::Storage::Ftp::Server do
     end
   end
 
-  context "#connection" do
-    it "returns the reconnected connection for the given server (to avoid closed socket errors)" do
-      connection = double("connection")
-      server.should_receive(:build_connection).once.and_return(connection)
-      connection.should_receive(:close).twice
-      connection.should_receive(:connect).with(server.host, server.port).twice
-      connection.should_receive(:login).with(server.user, server.password).twice
-      2.times { server.connection.should == connection }
-    end
-  end
-
-  context "#build_connection" do
-    it "returns an ftp connection for the given server" do
-      connection = double("connection")
-      Net::FTP.should_receive(:new).and_return(connection)
-      connection.should_receive(:passive=).with(server.passive)
-      connection.should_receive(:connect).with(server.host, server.port)
-      server.build_connection.should == connection
+  context "#establish_connection" do
+    it "creates the ftp connection for the given server" do
+      ftp = double("ftp")
+      Net::FTP.should_receive(:new).and_return(ftp)
+      ftp.should_receive(:passive=).with(server.passive)
+      ftp.should_receive(:connect).with(server.host, server.port)
+      ftp.should_receive(:login).with(server.user, server.password)
+      server.establish_connection
+      server.connection.should == ftp
     end
   end
 

@@ -26,6 +26,9 @@ describe Paperclip::Storage::Ftp do
     })
   end
 
+  let(:first_server)  { Paperclip::Storage::Ftp::Server.new }
+  let(:second_server) { Paperclip::Storage::Ftp::Server.new }
+
   context "#exists?" do
     it "returns false if original_filename not set" do
       attachment.stub(:original_filename).and_return(nil)
@@ -33,12 +36,14 @@ describe Paperclip::Storage::Ftp do
     end
 
     it "returns true if the file exists on the primary server" do
-      attachment.primary_ftp_server.should_receive(:file_exists?).with("/files/original/foo.jpg").and_return(true)
+      first_server.should_receive(:file_exists?).with("/files/original/foo.jpg").and_return(true)
+      attachment.should_receive(:with_primary_ftp_server).and_yield(first_server)
       attachment.exists?.should be_true
     end
 
     it "accepts an optional style_name parameter to build the correct file path" do
-      attachment.primary_ftp_server.should_receive(:file_exists?).with("/files/thumb/foo.jpg").and_return(true)
+      first_server.should_receive(:file_exists?).with("/files/thumb/foo.jpg").and_return(true)
+      attachment.should_receive(:with_primary_ftp_server).and_yield(first_server)
       attachment.exists?(:thumb)
     end
   end
@@ -49,7 +54,8 @@ describe Paperclip::Storage::Ftp do
       tempfile.should_receive(:path).and_return("/tmp/foo")
       tempfile.should_receive(:rewind).with(no_args)
       Tempfile.should_receive(:new).with(["foo", ".jpg"]).and_return(tempfile)
-      attachment.primary_ftp_server.should_receive(:get_file).with("/files/original/foo.jpg", "/tmp/foo").and_return(:foo)
+      first_server.should_receive(:get_file).with("/files/original/foo.jpg", "/tmp/foo").and_return(:foo)
+      attachment.should_receive(:with_primary_ftp_server).and_yield(first_server)
       attachment.to_file.should == tempfile
     end
 
@@ -58,7 +64,8 @@ describe Paperclip::Storage::Ftp do
       tempfile.should_receive(:path).and_return("/tmp/foo")
       tempfile.should_receive(:rewind).with(no_args)
       Tempfile.should_receive(:new).with(["foo", ".jpg"]).and_return(tempfile)
-      attachment.primary_ftp_server.should_receive(:get_file).with("/files/thumb/foo.jpg", anything)
+      first_server.should_receive(:get_file).with("/files/thumb/foo.jpg", anything)
+      attachment.should_receive(:with_primary_ftp_server).and_yield(first_server)
       attachment.to_file(:thumb)
     end
 
@@ -80,10 +87,13 @@ describe Paperclip::Storage::Ftp do
         :thumb    => thumb_file
       })
 
-      attachment.ftp_servers.first.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
-      attachment.ftp_servers.first.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
-      attachment.ftp_servers.second.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
-      attachment.ftp_servers.second.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
+      first_server.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
+      first_server.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
+      second_server.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
+      second_server.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
+
+      attachment.should_receive(:with_ftp_servers).and_yield([first_server, second_server])
+
       attachment.should_receive(:after_flush_writes).with(no_args)
 
       attachment.flush_writes
@@ -98,10 +108,13 @@ describe Paperclip::Storage::Ftp do
         "/files/original/foo.jpg",
         "/files/thumb/foo.jpg"
       ])
-      attachment.ftp_servers.first.should_receive(:delete_file).with("/files/original/foo.jpg")
-      attachment.ftp_servers.first.should_receive(:delete_file).with("/files/thumb/foo.jpg")
-      attachment.ftp_servers.second.should_receive(:delete_file).with("/files/original/foo.jpg")
-      attachment.ftp_servers.second.should_receive(:delete_file).with("/files/thumb/foo.jpg")
+
+      first_server.should_receive(:delete_file).with("/files/original/foo.jpg")
+      first_server.should_receive(:delete_file).with("/files/thumb/foo.jpg")
+      second_server.should_receive(:delete_file).with("/files/original/foo.jpg")
+      second_server.should_receive(:delete_file).with("/files/thumb/foo.jpg")
+
+      attachment.should_receive(:with_ftp_servers).and_yield([first_server, second_server])
 
       attachment.flush_deletes
 
@@ -110,14 +123,44 @@ describe Paperclip::Storage::Ftp do
   end
 
   context "#copy_to_local_file" do
+    before do
+      attachment.should_receive(:with_primary_ftp_server).and_yield(first_server)
+    end
+
     it "returns the file from the primary server and stores it in the path specified" do
-      attachment.primary_ftp_server.should_receive(:get_file).with("/files/original/foo.jpg", "/local/foo").and_return(:foo)
-      attachment.copy_to_local_file(:original, "/local/foo")
+      first_server.should_receive(:get_file).with("/files/original/foo.jpg", "/local/foo").and_return(:foo)
+      attachment.copy_to_local_file(:original, "/local/foo").should == :foo
     end
 
     it "accepts the style parameter to build the correct path" do
-      attachment.primary_ftp_server.should_receive(:get_file).with("/files/thumb/foo.jpg", "/local/thumb/foo").and_return(:foo)
+      first_server.should_receive(:get_file).with("/files/thumb/foo.jpg", "/local/thumb/foo")
       attachment.copy_to_local_file(:thumb, "/local/thumb/foo")
+    end
+  end
+
+  context "#with_primary_ftp_server" do
+    it "yields the connected primary ftp server, closes the connection afterwards" do
+      attachment.stub(:primary_ftp_server).and_return(first_server)
+      first_server.should_receive(:establish_connection).ordered
+      first_server.should_receive(:close_connection).ordered
+      expect { |b| attachment.with_primary_ftp_server(&b) }.to yield_with_args(first_server)
+    end
+  end
+
+  context "#primary_ftp_server" do
+    it "returns the first server in the list" do
+      attachment.primary_ftp_server.should equal(attachment.ftp_servers.first)
+    end
+  end
+
+  context "#with_ftp_servers" do
+    it "yields the connected ftp servers, closes the connections afterwards" do
+      attachment.stub(:ftp_servers).and_return([first_server, second_server])
+      first_server.should_receive(:establish_connection).ordered
+      second_server.should_receive(:establish_connection).ordered
+      first_server.should_receive(:close_connection).ordered
+      second_server.should_receive(:close_connection).ordered
+      expect { |b| attachment.with_ftp_servers(&b) }.to yield_with_args([first_server, second_server])
     end
   end
 
@@ -131,12 +174,6 @@ describe Paperclip::Storage::Ftp do
       attachment.ftp_servers.second.user.should     == "user2"
       attachment.ftp_servers.second.password.should == "password2"
       attachment.ftp_servers.second.passive.should  == true
-    end
-  end
-
-  context "#primary_ftp_server" do
-    it "returns the first server in the list" do
-      attachment.primary_ftp_server.should == attachment.ftp_servers.first
     end
   end
 end

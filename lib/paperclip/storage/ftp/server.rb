@@ -6,13 +6,8 @@ module Paperclip
     module Ftp
       class Server
 
-        @@connections = {}
-
-        def self.clear_connections
-          @@connections.clear
-        end
-
         attr_accessor :host, :user, :password, :port, :passive
+        attr_reader :connection
 
         def initialize(options = {})
           options.each do |k,v|
@@ -21,6 +16,17 @@ module Paperclip
 
           @port    = Net::FTP::FTP_PORT if @port.nil?
           @passive = true if @passive.nil?
+        end
+
+        def establish_connection
+          @connection = Net::FTP.new
+          @connection.passive = passive
+          @connection.connect(host, port)
+          @connection.login(user, password)
+        end
+
+        def close_connection
+          connection.close if connection && !connection.closed?
         end
 
         def file_exists?(path)
@@ -42,21 +48,6 @@ module Paperclip
 
         def delete_file(remote_file_path)
           connection.delete(remote_file_path)
-        end
-
-        def connection
-          connection = @@connections["#{user}@#{host}:#{port}"] ||= build_connection
-          connection.close
-          connection.connect(host, port)
-          connection.login(user, password)
-          connection
-        end
-
-        def build_connection
-          connection = Net::FTP.new
-          connection.passive = passive
-          connection.connect(host, port)
-          connection
         end
 
         def mkdir_p(dirname)
