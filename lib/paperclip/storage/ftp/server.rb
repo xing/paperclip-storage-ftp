@@ -7,15 +7,14 @@ module Paperclip
       class Server
 
         attr_accessor :host, :user, :password, :port, :passive
-        attr_reader :connection
+        attr_reader   :connection
 
         def initialize(options = {})
           options.each do |k,v|
             send("#{k}=", v)
           end
 
-          @port    = Net::FTP::FTP_PORT if @port.nil?
-          @passive = true if @passive.nil?
+          @port ||= Net::FTP::FTP_PORT
         end
 
         def establish_connection
