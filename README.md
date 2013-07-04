@@ -67,6 +67,16 @@ class User < ActiveRecord::Base
 end
 ```
 
+## Changelog
+
+### 1.1.0
+
+Mostly performance enhancements
+
+* Use one thread per server to upload assets to multiple servers in parallel [#10](https://github.com/xing/paperclip-storage-ftp/issues/10)
+* Avoid excessive reconnects to reduce overall upload time
+* Close connnection immediately after being used
+
 ## Contributing
 
 1. Fork it
