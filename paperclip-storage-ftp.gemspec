@@ -5,6 +5,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{Allow Paperclip attachments to be stored on FTP servers}
   gem.summary       = %q{Allow Paperclip attachments to be stored on FTP servers}
   gem.homepage      = "https://github.com/xing/paperclip-storage-ftp"
+  gem.license       = "MIT"
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
