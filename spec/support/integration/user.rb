@@ -35,4 +35,6 @@ class User < ActiveRecord::Base
         :port     => 2121
       }
     ]
+
+  validates_attachment_content_type :avatar, :content_type => /\Aimage\/.*\Z/
 end
