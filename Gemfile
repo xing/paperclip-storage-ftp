@@ -7,3 +7,8 @@ group :test do
   gem "sqlite3",                          :platforms => :ruby
   gem "activerecord-jdbcsqlite3-adapter", "1.3.0.beta2", :platforms => :jruby
 end
+
+platforms :rbx do
+  gem 'rubysl', '~> 2.0'
+  gem 'json'
+end
