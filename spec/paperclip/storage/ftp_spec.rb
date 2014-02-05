@@ -23,7 +23,8 @@ describe Paperclip::Storage::Ftp do
           :passive  => true
         }
       ],
-      :ftp_connect_timeout => 5
+      :ftp_connect_timeout => 5,
+      :ftp_ignore_failing_connections => true
     })
   end
 
@@ -140,9 +141,8 @@ describe Paperclip::Storage::Ftp do
   end
 
   context "#with_primary_ftp_server" do
-    it "yields the connected primary ftp server, closes the connection afterwards" do
+    it "yields the primary ftp server, closes the connection afterwards" do
       attachment.stub(:primary_ftp_server).and_return(first_server)
-      first_server.should_receive(:establish_connection).ordered
       first_server.should_receive(:close_connection).ordered
       expect { |b| attachment.with_primary_ftp_server(&b) }.to yield_with_args(first_server)
     end
@@ -150,15 +150,14 @@ describe Paperclip::Storage::Ftp do
 
   context "#primary_ftp_server" do
     it "returns the first server in the list" do
-      attachment.primary_ftp_server.should equal(attachment.ftp_servers.first)
+      attachment.stub(:ftp_servers).and_return([first_server, second_server])
+      attachment.primary_ftp_server.should == attachment.ftp_servers.first
     end
   end
 
   context "#with_ftp_servers" do
-    it "yields the connected ftp servers, closes the connections afterwards" do
+    it "yields the ftp servers, closes the connections afterwards" do
       attachment.stub(:ftp_servers).and_return([first_server, second_server])
-      first_server.should_receive(:establish_connection).ordered
-      second_server.should_receive(:establish_connection).ordered
       first_server.should_receive(:close_connection).ordered
       second_server.should_receive(:close_connection).ordered
       expect { |b| attachment.with_ftp_servers(&b) }.to yield_with_args([first_server, second_server])
@@ -167,16 +166,21 @@ describe Paperclip::Storage::Ftp do
 
   context "#ftp_servers" do
     it "returns the configured ftp servers" do
-      attachment.ftp_servers.first.host.should             == "ftp1.example.com"
-      attachment.ftp_servers.first.user.should             == "user1"
-      attachment.ftp_servers.first.password.should         == "password1"
-      attachment.ftp_servers.first.port.should             == 2121
-      attachment.ftp_servers.first.connect_timeout.should  == 5
-      attachment.ftp_servers.second.host.should            == "ftp2.example.com"
-      attachment.ftp_servers.second.user.should            == "user2"
-      attachment.ftp_servers.second.password.should        == "password2"
-      attachment.ftp_servers.second.passive.should         == true
-      attachment.ftp_servers.second.connect_timeout.should == 5
+      Paperclip::Storage::Ftp::Server.any_instance.stub(:establish_connection)
+      Paperclip::Storage::Ftp::Server.any_instance.stub(:connected?).and_return(true)
+
+      attachment.ftp_servers.first.host.should                   == "ftp1.example.com"
+      attachment.ftp_servers.first.user.should                   == "user1"
+      attachment.ftp_servers.first.password.should               == "password1"
+      attachment.ftp_servers.first.port.should                   == 2121
+      attachment.ftp_servers.first.connect_timeout.should        == 5
+      attachment.ftp_servers.first.ignore_connect_errors.should  == true
+      attachment.ftp_servers.second.host.should                  == "ftp2.example.com"
+      attachment.ftp_servers.second.user.should                  == "user2"
+      attachment.ftp_servers.second.password.should              == "password2"
+      attachment.ftp_servers.second.passive.should               == true
+      attachment.ftp_servers.second.connect_timeout.should       == 5
+      attachment.ftp_servers.second.ignore_connect_errors.should == true
     end
   end
 end

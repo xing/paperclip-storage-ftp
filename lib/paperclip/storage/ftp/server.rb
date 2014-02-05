@@ -7,7 +7,9 @@ module Paperclip
     module Ftp
       class Server
 
-        attr_accessor :host, :user, :password, :port, :passive, :connect_timeout
+        attr_accessor :host, :user, :password, :port, :passive,
+                      :connect_timeout, :ignore_connect_errors
+
         attr_reader   :connection
 
         def initialize(options = {})
@@ -22,23 +24,27 @@ module Paperclip
           @connection = Net::FTP.new
           @connection.passive = passive
 
-          if connect_timeout
-            Timeout.timeout(connect_timeout, Errno::ETIMEDOUT) do
-              @connection.connect(host, port)
+          if ignore_connect_errors
+            begin
+              connect
+            rescue SystemCallError => e
+              Paperclip.log("could not connect to ftp://#{user}@#{host}:#{port} (#{e})")
+              @connection = nil
+              return
             end
           else
-            @connection.connect(host, port)
+            connect
           end
 
           @connection.login(user, password)
         end
 
         def close_connection
-          connection.close if connection && !connection.closed?
-        rescue Net::FTPConnectionError
-          # This error can happen if the connection did not succeed
-          # (e.g. ran into connect timeout). We can ignore it, there is
-          # no socket to close then.
+          connection.close if connected?
+        end
+
+        def connected?
+          connection && !connection.closed?
         end
 
         def file_exists?(path)
@@ -71,6 +77,18 @@ module Paperclip
               # This error can be caused by an existing directory.
               # Ignore, and keep on trying to create child directories.
             end
+          end
+        end
+
+        private
+
+        def connect
+          if connect_timeout
+            Timeout.timeout(connect_timeout, Errno::ETIMEDOUT) do
+              @connection.connect(host, port)
+            end
+          else
+            @connection.connect(host, port)
           end
         end
       end

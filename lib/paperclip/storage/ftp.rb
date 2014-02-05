@@ -71,10 +71,12 @@ module Paperclip
       end
 
       def with_primary_ftp_server(&blk)
-        primary_ftp_server.establish_connection
-        yield primary_ftp_server
-      ensure
-        primary_ftp_server.close_connection
+        server = primary_ftp_server
+        begin
+          yield server
+        ensure
+          server.close_connection
+        end
       end
 
       def primary_ftp_server
@@ -82,16 +84,24 @@ module Paperclip
       end
 
       def with_ftp_servers(&blk)
-        ftp_servers.each(&:establish_connection)
-        yield ftp_servers
-      ensure
-        ftp_servers.each(&:close_connection)
+        servers = ftp_servers
+        begin
+          yield servers
+        ensure
+          servers.each(&:close_connection)
+        end
       end
 
       def ftp_servers
-        @ftp_servers ||= @options[:ftp_servers].map do |config|
-          Server.new(config.merge(:connect_timeout => @options[:ftp_connect_timeout]))
+        ftp_servers = @options[:ftp_servers].map do |server_options|
+          server = Server.new(server_options.merge(
+            :connect_timeout       => @options[:ftp_connect_timeout],
+            :ignore_connect_errors => @options[:ftp_ignore_failing_connections]
+          ))
+          server.establish_connection
+          server
         end
+        ftp_servers.select{|s| s.connected? }
       end
     end
   end

@@ -67,7 +67,13 @@ class User < ActiveRecord::Base
 
     # Optional socket connect timeout (in seconds).
     # This only limits the connection phase, once connected this option is of no more use.
-    :ftp_connect_timeout => 5
+    :ftp_connect_timeout => 5, # optional, nil by default (OS default timeout)
+
+    # If set to true and the connection to a particular server cannot be established,
+    # the connection error will be ignored and the files will not be uploaded to that server.
+    # If set to false and the connection to a particular server cannot be established,
+    # a SystemCallError will be raised (Errno::ETIMEDOUT, Errno::ENETUNREACH, etc.).
+    :ftp_ignore_failing_connections => true # optional, false by default
 end
 ```
 
