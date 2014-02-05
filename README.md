@@ -92,7 +92,7 @@ Mostly performance enhancements
 
 You can find out more about our work on our [dev blog](http://devblog.xing.com).
 
-Copyright (c) 2013 [XING AG](http://www.xing.com)
+Copyright (c) 2014 [XING AG](http://www.xing.com)
 
 Released under the MIT license. For full details see [LICENSE](https://github.com/xing/paperclip-storage-ftp/blob/master/LICENSE)
 included in this distribution.
