@@ -27,7 +27,8 @@ class FtpServer
       :start_command  => "cd #{INSTALL_PATH}; ./bin/ftpd.sh res/conf/ftpd-typical.xml",
       :ping_command   => [:tcp, '127.0.0.1', 2121],
       :pid_file       => INSTALL_PATH + "/res/ftpd.pid",
-      :log_file       => INSTALL_PATH + "/res/log/ftpd.log"
+      :log_file       => INSTALL_PATH + "/res/log/ftpd.log",
+      :start_timeout  => 30
     )
   end
 end
