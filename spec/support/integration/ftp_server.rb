@@ -28,7 +28,7 @@ class FtpServer
       :ping_command   => [:tcp, '127.0.0.1', 2121],
       :pid_file       => INSTALL_PATH + "/res/ftpd.pid",
       :log_file       => INSTALL_PATH + "/res/log/ftpd.log",
-      :start_timeout  => 30
+      :start_timeout  => ENV['TRAVIS'] ? 120 : 10
     )
   end
 end
