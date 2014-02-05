@@ -50,7 +50,7 @@ class UserWithConnectTimeout < ActiveRecord::Base
     :storage  => :ftp,
     :ftp_servers => [
       {
-        :host     => "127.0.0.2", # should be unavailable
+        :host     => "192.0.2.0", # should be unavailable (RFC 5737)
         :user     => "foo",
         :password => "bar",
         :port     => 2121
