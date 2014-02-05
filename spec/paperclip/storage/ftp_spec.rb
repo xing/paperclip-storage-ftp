@@ -22,7 +22,8 @@ describe Paperclip::Storage::Ftp do
           :password => "password2",
           :passive  => true
         }
-      ]
+      ],
+      :ftp_connect_timeout => 5
     })
   end
 
@@ -166,14 +167,16 @@ describe Paperclip::Storage::Ftp do
 
   context "#ftp_servers" do
     it "returns the configured ftp servers" do
-      attachment.ftp_servers.first.host.should      == "ftp1.example.com"
-      attachment.ftp_servers.first.user.should      == "user1"
-      attachment.ftp_servers.first.password.should  == "password1"
-      attachment.ftp_servers.first.port.should      == 2121
-      attachment.ftp_servers.second.host.should     == "ftp2.example.com"
-      attachment.ftp_servers.second.user.should     == "user2"
-      attachment.ftp_servers.second.password.should == "password2"
-      attachment.ftp_servers.second.passive.should  == true
+      attachment.ftp_servers.first.host.should             == "ftp1.example.com"
+      attachment.ftp_servers.first.user.should             == "user1"
+      attachment.ftp_servers.first.password.should         == "password1"
+      attachment.ftp_servers.first.port.should             == 2121
+      attachment.ftp_servers.first.connect_timeout.should  == 5
+      attachment.ftp_servers.second.host.should            == "ftp2.example.com"
+      attachment.ftp_servers.second.user.should            == "user2"
+      attachment.ftp_servers.second.password.should        == "password2"
+      attachment.ftp_servers.second.passive.should         == true
+      attachment.ftp_servers.second.connect_timeout.should == 5
     end
   end
 end

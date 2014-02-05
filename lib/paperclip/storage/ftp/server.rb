@@ -1,12 +1,13 @@
 require "pathname"
 require "net/ftp"
+require "timeout"
 
 module Paperclip
   module Storage
     module Ftp
       class Server
 
-        attr_accessor :host, :user, :password, :port, :passive
+        attr_accessor :host, :user, :password, :port, :passive, :connect_timeout
         attr_reader   :connection
 
         def initialize(options = {})
@@ -20,12 +21,24 @@ module Paperclip
         def establish_connection
           @connection = Net::FTP.new
           @connection.passive = passive
-          @connection.connect(host, port)
+
+          if connect_timeout
+            Timeout.timeout(connect_timeout, Errno::ETIMEDOUT) do
+              @connection.connect(host, port)
+            end
+          else
+            @connection.connect(host, port)
+          end
+
           @connection.login(user, password)
         end
 
         def close_connection
           connection.close if connection && !connection.closed?
+        rescue Net::FTPConnectionError
+          # This error can happen if the connection did not succeed
+          # (e.g. ran into connect timeout). We can ignore it, there is
+          # no socket to close then.
         end
 
         def file_exists?(path)

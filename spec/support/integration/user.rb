@@ -38,3 +38,25 @@ class User < ActiveRecord::Base
 
   validates_attachment_content_type :avatar, :content_type => /\Aimage\/.*\Z/
 end
+
+class UserWithConnectTimeout < ActiveRecord::Base
+  include Paperclip::Glue
+
+  TIMEOUT = 0.1
+
+  self.table_name = "users"
+
+  has_attached_file :avatar,
+    :storage  => :ftp,
+    :ftp_servers => [
+      {
+        :host     => "127.0.0.2", # should be unavailable
+        :user     => "foo",
+        :password => "bar",
+        :port     => 2121
+      }
+    ],
+    :ftp_connect_timeout => TIMEOUT
+
+  validates_attachment_content_type :avatar, :content_type => /\Aimage\/.*\Z/
+end

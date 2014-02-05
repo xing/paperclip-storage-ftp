@@ -6,18 +6,15 @@ describe Paperclip::Storage::Ftp::Server do
   context "initialize" do
     it "accepts options to initialize attributes" do
       options = {
-        :host     => "ftp.example.com",
-        :user     => "user",
-        :password => "password",
-        :port     => 2121,
-        :passive  => true
+        :host            => "ftp.example.com",
+        :user            => "user",
+        :password        => "password",
+        :port            => 2121,
+        :passive         => true,
+        :connect_timeout => 2
       }
       server = Paperclip::Storage::Ftp::Server.new(options)
-      server.host.should     == options[:host]
-      server.user.should     == options[:user]
-      server.password.should == options[:password]
-      server.port.should     == options[:port]
-      server.passive.should  == options[:passive]
+      options.each{|k,v| server.send(k).should == v }
     end
 
     it "sets a default port" do

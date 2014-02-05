@@ -63,7 +63,11 @@ class User < ActiveRecord::Base
         :port     => 2121, # optional, 21 by default
         :passive  => true  # optional, false by default
       }
-    ]
+    ],
+
+    # Optional socket connect timeout (in seconds).
+    # This only limits the connection phase, once connected this option is of no more use.
+    :ftp_connect_timeout => 5
 end
 ```
 

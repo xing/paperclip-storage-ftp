@@ -89,7 +89,9 @@ module Paperclip
       end
 
       def ftp_servers
-        @ftp_servers ||= @options[:ftp_servers].map{|config| Server.new(config) }
+        @ftp_servers ||= @options[:ftp_servers].map do |config|
+          Server.new(config.merge(:connect_timeout => @options[:ftp_connect_timeout]))
+        end
       end
     end
   end

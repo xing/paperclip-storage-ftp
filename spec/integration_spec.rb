@@ -1,4 +1,5 @@
 require "spec_helper"
+require "timeout"
 
 describe "paperclip-storage-ftp", :integration => true do
 
@@ -65,5 +66,18 @@ describe "paperclip-storage-ftp", :integration => true do
 
     File.exists?(uploaded_file_server1).should be_true
     File.exists?(uploaded_file_server2).should be_true
+  end
+
+  it "allows setting a connect timeout" do
+    user = UserWithConnectTimeout.new
+    user.avatar = file
+
+    # Wrap the expectation in a timeout block to make
+    # sure we don't accidentally get a passing test by waiting
+    # for the Errno::ETIMEDOUT raised by the OS (usually in the
+    # seconds or minutes range)
+    Timeout.timeout(UserWithConnectTimeout::TIMEOUT + 1) do
+      expect { user.save! }.to raise_error(Errno::ETIMEDOUT)
+    end
   end
 end
