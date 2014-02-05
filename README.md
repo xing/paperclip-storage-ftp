@@ -79,6 +79,10 @@ end
 
 ## Changelog
 
+### 1.2.0
+
+* New options `:ftp_connect_timeout` and `:ftp_ignore_failing_connections`. See usage example above.
+
 ### 1.1.0
 
 Mostly performance enhancements
