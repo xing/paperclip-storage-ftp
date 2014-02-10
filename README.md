@@ -79,6 +79,11 @@ end
 
 ## Changelog
 
+### 1.2.1
+
+* Raise `Paperclip::Storage::Ftp::NoServerAvailable` error when using `:ftp_ignore_failing_connections => true` but all servers are down
+* Avoid connecting to all servers for operations that just need one
+
 ### 1.2.0
 
 * New options `:ftp_connect_timeout` and `:ftp_ignore_failing_connections`. See usage example above.
