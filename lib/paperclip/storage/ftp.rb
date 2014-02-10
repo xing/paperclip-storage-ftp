@@ -7,6 +7,9 @@ require "paperclip/storage/ftp/server"
 module Paperclip
   module Storage
     module Ftp
+
+      class NoServerAvailable < StandardError; end
+
       def exists?(style_name = default_style)
         return false unless original_filename
         with_primary_ftp_server do |server|
@@ -80,7 +83,11 @@ module Paperclip
       end
 
       def primary_ftp_server
-        ftp_servers.first
+        @options[:ftp_servers].each do |server_options|
+          server = build_and_connect_server(server_options)
+          return server if server.connected?
+        end
+        raise NoServerAvailable
       end
 
       def with_ftp_servers(&blk)
@@ -93,15 +100,21 @@ module Paperclip
       end
 
       def ftp_servers
-        ftp_servers = @options[:ftp_servers].map do |server_options|
-          server = Server.new(server_options.merge(
-            :connect_timeout       => @options[:ftp_connect_timeout],
-            :ignore_connect_errors => @options[:ftp_ignore_failing_connections]
-          ))
-          server.establish_connection
-          server
+        servers = @options[:ftp_servers].map do |server_options|
+          build_and_connect_server(server_options)
         end
-        ftp_servers.select{|s| s.connected? }
+        available_servers = servers.select{|s| s.connected? }
+        raise NoServerAvailable if available_servers.empty?
+        available_servers
+      end
+
+      def build_and_connect_server(server_options)
+        server = Server.new(server_options.merge(
+          :connect_timeout       => @options[:ftp_connect_timeout],
+          :ignore_connect_errors => @options[:ftp_ignore_failing_connections]
+        ))
+        server.establish_connection
+        server
       end
     end
   end

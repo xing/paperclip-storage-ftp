@@ -149,9 +149,24 @@ describe Paperclip::Storage::Ftp do
   end
 
   context "#primary_ftp_server" do
-    it "returns the first server in the list" do
-      attachment.stub(:ftp_servers).and_return([first_server, second_server])
-      attachment.primary_ftp_server.should == attachment.ftp_servers.first
+    it "returns the first configured server" do
+      first_server.stub(:connected? => true)
+      attachment.stub(:build_and_connect_server).and_return(first_server)
+      attachment.primary_ftp_server.should == first_server
+    end
+
+    it "returns the second server if first server is down" do
+      first_server.stub(:connected? => false)
+      second_server.stub(:connected? => true)
+      attachment.stub(:build_and_connect_server).and_return(first_server, second_server)
+      attachment.primary_ftp_server.should == second_server
+    end
+
+    it "raises NoServerAvailable error if all servers are down" do
+      first_server.stub(:connected? => false)
+      second_server.stub(:connected? => false)
+      attachment.stub(:build_and_connect_server).and_return(first_server, second_server)
+      expect { attachment.primary_ftp_server }.to raise_error(Paperclip::Storage::Ftp::NoServerAvailable)
     end
   end
 
@@ -166,21 +181,31 @@ describe Paperclip::Storage::Ftp do
 
   context "#ftp_servers" do
     it "returns the configured ftp servers" do
-      Paperclip::Storage::Ftp::Server.any_instance.stub(:establish_connection)
-      Paperclip::Storage::Ftp::Server.any_instance.stub(:connected?).and_return(true)
+      first_server.stub(:connected? => true)
+      second_server.stub(:connected? => true)
+      attachment.stub(:build_and_connect_server).and_return(first_server, second_server)
+      attachment.ftp_servers.should == [first_server, second_server]
+    end
 
-      attachment.ftp_servers.first.host.should                   == "ftp1.example.com"
-      attachment.ftp_servers.first.user.should                   == "user1"
-      attachment.ftp_servers.first.password.should               == "password1"
-      attachment.ftp_servers.first.port.should                   == 2121
-      attachment.ftp_servers.first.connect_timeout.should        == 5
-      attachment.ftp_servers.first.ignore_connect_errors.should  == true
-      attachment.ftp_servers.second.host.should                  == "ftp2.example.com"
-      attachment.ftp_servers.second.user.should                  == "user2"
-      attachment.ftp_servers.second.password.should              == "password2"
-      attachment.ftp_servers.second.passive.should               == true
-      attachment.ftp_servers.second.connect_timeout.should       == 5
-      attachment.ftp_servers.second.ignore_connect_errors.should == true
+    it "raises NoServerAvailable error if all servers are down" do
+      first_server.stub(:connected? => false)
+      second_server.stub(:connected? => false)
+      attachment.stub(:build_and_connect_server).and_return(first_server, second_server)
+      expect { attachment.ftp_servers }.to raise_error(Paperclip::Storage::Ftp::NoServerAvailable)
+    end
+  end
+
+  context "#build_and_connect_server" do
+    it "returns a connected server instance based on the given options" do
+      Paperclip::Storage::Ftp::Server.stub(:new).and_call_original
+
+      expected_options = attachment.options[:ftp_servers].first.merge(
+        :connect_timeout       => attachment.options[:ftp_connect_timeout],
+        :ignore_connect_errors => attachment.options[:ftp_ignore_failing_connections]
+      )
+      expect(first_server).to receive(:establish_connection)
+      Paperclip::Storage::Ftp::Server.stub(:new).with(expected_options).and_return(first_server)
+      attachment.build_and_connect_server(attachment.options[:ftp_servers].first).should == first_server
     end
   end
 end
