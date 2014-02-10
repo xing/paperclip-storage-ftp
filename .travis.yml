@@ -9,3 +9,6 @@ gemfile:
   - gemfiles/Gemfile.paperclip-2.x
   - gemfiles/Gemfile.paperclip-3.x
   - gemfiles/Gemfile.paperclip-4.x
+allow_failures:
+  - rvm: jruby-19mode
+  - rvm: rbx
