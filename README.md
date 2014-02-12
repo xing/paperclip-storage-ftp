@@ -3,10 +3,11 @@
 Allow [Paperclip](https://github.com/thoughtbot/paperclip) attachments
 to be stored on FTP servers.
 
-## Build status
+## Status
 
 [![Build Status](https://secure.travis-ci.org/xing/paperclip-storage-ftp.png)](http://travis-ci.org/xing/paperclip-storage-ftp)
 [![Coverage Status](https://coveralls.io/repos/xing/paperclip-storage-ftp/badge.png?branch=master)](https://coveralls.io/r/xing/paperclip-storage-ftp?branch=master)
+[![Gem Version](https://badge.fury.io/rb/paperclip-storage-ftp.png)](http://badge.fury.io/rb/paperclip-storage-ftp)
 
 ## Installation
 
