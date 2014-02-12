@@ -70,10 +70,10 @@ class User < ActiveRecord::Base
     # this option is of no more use.
     :ftp_connect_timeout => 5, # optional, nil by default (OS default timeout)
 
+    # Optional flag to skip dead servers.
     # If set to true and the connection to a particular server cannot be 
     # established, the connection error will be ignored and the files will
     # not be uploaded to that server.
-    #
     # If set to false and the connection to a particular server cannot be established,
     # a SystemCallError will be raised (Errno::ETIMEDOUT, Errno::ENETUNREACH, etc.).
     :ftp_ignore_failing_connections => true # optional, false by default
