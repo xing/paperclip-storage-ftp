@@ -6,6 +6,7 @@ to be stored on FTP servers.
 ## Build status
 
 [![Build Status](https://secure.travis-ci.org/xing/paperclip-storage-ftp.png)](http://travis-ci.org/xing/paperclip-storage-ftp)
+[![Coverage Status](https://coveralls.io/repos/xing/paperclip-storage-ftp/badge.png?branch=master)](https://coveralls.io/r/xing/paperclip-storage-ftp?branch=master)
 
 ## Installation
 
@@ -66,12 +67,12 @@ class User < ActiveRecord::Base
     ],
 
     # Optional socket connect timeout (in seconds).
-    # This only limits the connection phase, once connected 
+    # This only limits the connection phase, once connected
     # this option is of no more use.
     :ftp_connect_timeout => 5, # optional, nil by default (OS default timeout)
 
     # Optional flag to skip dead servers.
-    # If set to true and the connection to a particular server cannot be 
+    # If set to true and the connection to a particular server cannot be
     # established, the connection error will be ignored and the files will
     # not be uploaded to that server.
     # If set to false and the connection to a particular server cannot be established,
