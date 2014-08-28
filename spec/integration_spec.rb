@@ -27,12 +27,12 @@ describe "paperclip-storage-ftp", :integration => true do
     user.avatar = file
     user.save!
 
-    File.exists?(uploaded_file_server1).should be_true
-    File.exists?(uploaded_file_server1_medium).should be_true
-    File.exists?(uploaded_file_server1_thumb).should be_true
-    File.exists?(uploaded_file_server2).should be_true
-    File.exists?(uploaded_file_server2_medium).should be_true
-    File.exists?(uploaded_file_server2_thumb).should be_true
+    File.exists?(uploaded_file_server1).should be true
+    File.exists?(uploaded_file_server1_medium).should be true
+    File.exists?(uploaded_file_server1_thumb).should be true
+    File.exists?(uploaded_file_server2).should be true
+    File.exists?(uploaded_file_server2_medium).should be true
+    File.exists?(uploaded_file_server2_thumb).should be true
 
     file.size.should == File.size(uploaded_file_server1)
     file.size.should == File.size(uploaded_file_server2)
@@ -44,12 +44,12 @@ describe "paperclip-storage-ftp", :integration => true do
 
     user.destroy
 
-    File.exists?(uploaded_file_server1).should be_false
-    File.exists?(uploaded_file_server1_medium).should be_false
-    File.exists?(uploaded_file_server1_thumb).should be_false
-    File.exists?(uploaded_file_server2).should be_false
-    File.exists?(uploaded_file_server2_medium).should be_false
-    File.exists?(uploaded_file_server2_thumb).should be_false
+    File.exists?(uploaded_file_server1).should be false
+    File.exists?(uploaded_file_server1_medium).should be false
+    File.exists?(uploaded_file_server1_thumb).should be false
+    File.exists?(uploaded_file_server2).should be false
+    File.exists?(uploaded_file_server2_medium).should be false
+    File.exists?(uploaded_file_server2_thumb).should be false
   end
 
   it "survives temporarily closed ftp connections" do
@@ -64,8 +64,8 @@ describe "paperclip-storage-ftp", :integration => true do
     user.avatar = file
     user.save!
 
-    File.exists?(uploaded_file_server1).should be_true
-    File.exists?(uploaded_file_server2).should be_true
+    File.exists?(uploaded_file_server1).should be true
+    File.exists?(uploaded_file_server2).should be true
   end
 
   it "allows ignoring failed connections" do
@@ -73,12 +73,12 @@ describe "paperclip-storage-ftp", :integration => true do
     user.avatar = file
     expect{ user.save! }.to_not raise_error
 
-    File.exists?(uploaded_file_server1).should be_true
-    File.exists?(uploaded_file_server1_medium).should be_true
-    File.exists?(uploaded_file_server1_thumb).should be_true
-    File.exists?(uploaded_file_server2).should be_false
-    File.exists?(uploaded_file_server2_medium).should be_false
-    File.exists?(uploaded_file_server2_thumb).should be_false
+    File.exists?(uploaded_file_server1).should be true
+    File.exists?(uploaded_file_server1_medium).should be true
+    File.exists?(uploaded_file_server1_thumb).should be true
+    File.exists?(uploaded_file_server2).should be false
+    File.exists?(uploaded_file_server2_medium).should be false
+    File.exists?(uploaded_file_server2_thumb).should be false
   end
 
   it "raises a SystemCallError when not ignoring failed connections" do

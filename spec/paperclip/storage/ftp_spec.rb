@@ -34,13 +34,13 @@ describe Paperclip::Storage::Ftp do
   context "#exists?" do
     it "returns false if original_filename not set" do
       attachment.stub(:original_filename).and_return(nil)
-      attachment.exists?.should be_false
+      attachment.exists?.should be false
     end
 
     it "returns true if the file exists on the primary server" do
       first_server.should_receive(:file_exists?).with("/files/original/foo.jpg").and_return(true)
       attachment.should_receive(:with_primary_ftp_server).and_yield(first_server)
-      attachment.exists?.should be_true
+      attachment.exists?.should be true
     end
 
     it "accepts an optional style_name parameter to build the correct file path" do

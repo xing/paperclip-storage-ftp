@@ -30,22 +30,22 @@ describe Paperclip::Storage::Ftp::Server do
 
     it "returns true if the file exists on the server" do
       server.connection.should_receive(:nlst).with("/files/original").and_return(["foo.jpg"])
-      server.file_exists?("/files/original/foo.jpg").should be_true
+      server.file_exists?("/files/original/foo.jpg").should be true
     end
 
     it "recognizes complete file paths correctly" do
       server.connection.should_receive(:nlst).with("/files/original").and_return(["/files/original/foo.jpg"])
-      server.file_exists?("/files/original/foo.jpg").should be_true
+      server.file_exists?("/files/original/foo.jpg").should be true
     end
 
     it "returns false if the file does not exist on the server" do
       server.connection.should_receive(:nlst).with("/files/original").and_return([])
-      server.file_exists?("/files/original/foo.jpg").should be_false
+      server.file_exists?("/files/original/foo.jpg").should be false
     end
 
     it "returns false if the ftp server responds with a FTPTempError" do
       server.connection.should_receive(:nlst).with("/files/original").and_raise(Net::FTPTempError)
-      server.file_exists?("/files/original/foo.jpg").should be_false
+      server.file_exists?("/files/original/foo.jpg").should be false
     end
   end
 
