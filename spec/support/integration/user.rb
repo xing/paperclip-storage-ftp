@@ -40,29 +40,27 @@ class UserBase < ActiveRecord::Base
     }
   end
 
-  # must be called after has_attached_file
-  def self.setup_validation
+  def self.setup_avatar_attachment(options = avatar_options)
+    has_attached_file :avatar, options
     validates_attachment_content_type :avatar, :content_type => /\Aimage\/.*\Z/
   end
 end
 
 class User < UserBase
-  has_attached_file :avatar, avatar_options
-  setup_validation
+  setup_avatar_attachment
 end
 
 class UserWithConnectTimeout < UserBase
   TIMEOUT = 0.1
 
-  has_attached_file :avatar, avatar_options.merge(
+  setup_avatar_attachment(avatar_options.merge(
     :ftp_servers => [
       {
         :host => "127.0.0.2" # should raise Errno::ETIMEDOUT
       }
     ],
     :ftp_connect_timeout => TIMEOUT
-  )
-  setup_validation
+  ))
 end
 
 class UserWithInvalidPort < UserBase
@@ -87,15 +85,13 @@ class UserWithInvalidPort < UserBase
 end
 
 class UserIgnoringFailingConnection < UserWithInvalidPort
-  has_attached_file :avatar, avatar_options.merge(
+  setup_avatar_attachment(avatar_options.merge(
     :ftp_ignore_failing_connections => true
-  )
-  setup_validation
+  ))
 end
 
 class UserNotIgnoringFailingConnection < UserWithInvalidPort
-  has_attached_file :avatar, avatar_options.merge(
+  setup_avatar_attachment(avatar_options.merge(
     :ftp_ignore_failing_connections => false
-  )
-  setup_validation
+  ))
 end
