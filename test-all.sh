@@ -14,7 +14,7 @@ else
   printf "ERROR: An RVM installation was not found.\n"
 fi
 
-for ruby in '1.9.3' '2.0.0' '2.1.0' 'jruby --1.9' 'rbx'
+for ruby in '1.9.3' '2.1' 'jruby --1.9' 'rbx'
 do
   rvm try_install $ruby
   rvm use $ruby
