@@ -59,6 +59,9 @@ module Paperclip
               @queued_for_delete.each do |path|
                 log("deleting ftp://#{server.user}@#{server.host}:#{path}")
                 server.delete_file(path)
+
+                log("deleting empty parent directories ftp://#{server.user}@#{server.host}:#{path}")
+                server.rmdir_p(File.dirname(path))
               end
             end
           end.each(&:join)

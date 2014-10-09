@@ -112,9 +112,13 @@ describe Paperclip::Storage::Ftp do
       ])
 
       first_server.should_receive(:delete_file).with("/files/original/foo.jpg")
+      first_server.should_receive(:rmdir_p).with("/files/original")
       first_server.should_receive(:delete_file).with("/files/thumb/foo.jpg")
+      first_server.should_receive(:rmdir_p).with("/files/thumb")
       second_server.should_receive(:delete_file).with("/files/original/foo.jpg")
+      second_server.should_receive(:rmdir_p).with("/files/original")
       second_server.should_receive(:delete_file).with("/files/thumb/foo.jpg")
+      second_server.should_receive(:rmdir_p).with("/files/thumb")
 
       attachment.should_receive(:with_ftp_servers).and_yield([first_server, second_server])
 
