@@ -83,6 +83,20 @@ describe Paperclip::Storage::Ftp::Server do
     end
   end
 
+  context "#rmdir_p" do
+    before do
+      server.stub(:connection).and_return(double("connection"))
+    end
+
+    it "deletes the directory and all parent directories" do
+      server.connection.should_receive(:rmdir).with("/files/foo/bar")
+      server.connection.should_receive(:rmdir).with("/files/foo")
+      server.connection.should_receive(:rmdir).with("/files"){ raise Net::FTPPermError }
+      server.connection.should_not_receive(:rmdir).with("/")
+      server.rmdir_p("/files/foo/bar")
+    end
+  end
+
   context "#establish_connection" do
     it "creates the ftp connection for the given server" do
       ftp = double("ftp")

@@ -47,9 +47,12 @@ describe "paperclip-storage-ftp", :integration => true do
     File.exists?(uploaded_file_server1).should be false
     File.exists?(uploaded_file_server1_medium).should be false
     File.exists?(uploaded_file_server1_thumb).should be false
+    Dir.exists?(File.dirname(uploaded_file_server1)).should be false
+
     File.exists?(uploaded_file_server2).should be false
     File.exists?(uploaded_file_server2_medium).should be false
     File.exists?(uploaded_file_server2_thumb).should be false
+    Dir.exists?(File.dirname(uploaded_file_server2)).should be false
   end
 
   it "survives temporarily closed ftp connections" do

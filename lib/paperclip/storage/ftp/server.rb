@@ -68,6 +68,15 @@ module Paperclip
           connection.delete(remote_file_path)
         end
 
+        def rmdir_p(dir_path)
+          while(true)
+            connection.rmdir(dir_path)
+            dir_path =  File.dirname(dir_path)
+          end
+        rescue Net::FTPTempError, Net::FTPPermError
+          # Stop trying to remove parent directories
+        end
+
         def mkdir_p(dirname)
           pathname = Pathname.new(dirname)
           pathname.descend do |p|
