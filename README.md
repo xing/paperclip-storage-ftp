@@ -84,6 +84,10 @@ end
 
 ## Changelog
 
+### 1.2.2
+
+* Remove empty parent directories after image deletion [#21](https://github.com/xing/paperclip-storage-ftp/pull/21)
+
 ### 1.2.1
 
 * Raise `Paperclip::Storage::Ftp::NoServerAvailable` error when using `:ftp_ignore_failing_connections => true` but all servers are down
