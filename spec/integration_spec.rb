@@ -1,5 +1,6 @@
 require "spec_helper"
 require "timeout"
+require "fileutils"
 
 describe "paperclip-storage-ftp", :integration => true do
 
@@ -22,6 +23,8 @@ describe "paperclip-storage-ftp", :integration => true do
   let(:uploaded_file_server2)         { FtpServer::USER2_PATH + "/original/avatar.jpg" }
   let(:uploaded_file_server2_medium)  { FtpServer::USER2_PATH + "/medium/avatar.jpg"   }
   let(:uploaded_file_server2_thumb)   { FtpServer::USER2_PATH + "/thumb/avatar.jpg"    }
+
+  let(:uploaded_file_server1_other)   { FtpServer::USER1_PATH + "/original/foo.txt" }
 
   it "stores the attachment on the ftp servers" do
     user.avatar = file
@@ -47,12 +50,31 @@ describe "paperclip-storage-ftp", :integration => true do
     File.exists?(uploaded_file_server1).should be false
     File.exists?(uploaded_file_server1_medium).should be false
     File.exists?(uploaded_file_server1_thumb).should be false
-    Dir.exists?(File.dirname(uploaded_file_server1)).should be false
 
     File.exists?(uploaded_file_server2).should be false
     File.exists?(uploaded_file_server2_medium).should be false
     File.exists?(uploaded_file_server2_thumb).should be false
+  end
+
+  it "removes empty parent directories after image deletion" do
+    user.avatar = file
+    user.save!
+
+    user.destroy
+
+    Dir.exists?(File.dirname(uploaded_file_server1)).should be false
     Dir.exists?(File.dirname(uploaded_file_server2)).should be false
+  end
+
+  it "does not remove parent directories which are not empty" do
+    user.avatar = file
+    user.save!
+
+    FileUtils.touch(uploaded_file_server1_other)
+
+    user.destroy
+
+    File.exists?(uploaded_file_server1_other).should be true
   end
 
   it "survives temporarily closed ftp connections" do
