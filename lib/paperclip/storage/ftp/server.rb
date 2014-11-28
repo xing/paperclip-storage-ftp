@@ -50,7 +50,7 @@ module Paperclip
         def file_exists?(path)
           pathname = Pathname.new(path)
           connection.nlst(pathname.dirname.to_s).map{|f| File.basename f }.include?(pathname.basename.to_s)
-        rescue Net::FTPTempError
+        rescue Net::FTPTempError, Net::FTPPermError
           false
         end
 

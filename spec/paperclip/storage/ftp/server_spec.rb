@@ -47,6 +47,11 @@ describe Paperclip::Storage::Ftp::Server do
       server.connection.should_receive(:nlst).with("/files/original").and_raise(Net::FTPTempError)
       server.file_exists?("/files/original/foo.jpg").should be false
     end
+
+    it "returns false if the ftp server responds with a FTPPermError" do
+      server.connection.should_receive(:nlst).with("/files/original").and_raise(Net::FTPPermError)
+      server.file_exists?("/files/original/foo.jpg").should be false
+    end
   end
 
   context "#get_file" do
