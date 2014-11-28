@@ -84,6 +84,10 @@ end
 
 ## Changelog
 
+### 1.2.3
+
+* Rescue FTPPermError exception during `file_exists?` [#22](https://github.com/xing/paperclip-storage-ftp/pull/22)
+
 ### 1.2.2
 
 * Remove empty parent directories after image deletion [#21](https://github.com/xing/paperclip-storage-ftp/pull/21)
