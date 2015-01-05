@@ -39,46 +39,46 @@ In your model:
 class User < ActiveRecord::Base
   has_attached_file :avatar,
 
-    # Choose the FTP storage backend
-    :storage => :ftp,
+  # Choose the FTP storage backend
+  :storage => :ftp,
 
-    # Set where to store the file on the FTP server(s).
-    # This supports Paperclip::Interpolations.
-    :path => "/path_on_ftp_server/:attachment/:id/:style/:filename",
+  # Set where to store the file on the FTP server(s).
+  # This supports Paperclip::Interpolations.
+  :path => "/path_on_ftp_server/:attachment/:id/:style/:filename",
 
-    # The full URL of where the attachment is publicly accessible.
-    # This supports Paperclip::Interpolations.
-    :url => "/url_prefix/:attachment/:id/:style/:filename",
+  # The full URL of where the attachment is publicly accessible.
+  # This supports Paperclip::Interpolations.
+  :url => "/url_prefix/:attachment/:id/:style/:filename",
 
-    # The list of FTP servers to use
-    :ftp_servers => [
-      {
-        :host     => "ftp1.example.com",
-        :user     => "foo",
-        :password => "bar"
-      },
-      # Add more servers if needed
-      {
-        :host     => "ftp2.example.com",
-        :user     => "foo",
-        :password => "bar",
-        :port     => 2121, # optional, 21 by default
-        :passive  => true  # optional, false by default
-      }
-    ],
+  # The list of FTP servers to use
+  :ftp_servers => [
+    {
+      :host     => "ftp1.example.com",
+      :user     => "foo",
+      :password => "bar"
+    },
+    # Add more servers if needed
+    {
+      :host     => "ftp2.example.com",
+      :user     => "foo",
+      :password => "bar",
+      :port     => 2121, # optional, 21 by default
+      :passive  => true  # optional, false by default
+    }
+  ],
 
-    # Optional socket connect timeout (in seconds).
-    # This only limits the connection phase, once connected
-    # this option is of no more use.
-    :ftp_connect_timeout => 5, # optional, nil by default (OS default timeout)
+  # Optional socket connect timeout (in seconds).
+  # This only limits the connection phase, once connected
+  # this option is of no more use.
+  :ftp_connect_timeout => 5, # optional, nil by default (OS default timeout)
 
-    # Optional flag to skip dead servers.
-    # If set to true and the connection to a particular server cannot be
-    # established, the connection error will be ignored and the files will
-    # not be uploaded to that server.
-    # If set to false and the connection to a particular server cannot be established,
-    # a SystemCallError will be raised (Errno::ETIMEDOUT, Errno::ENETUNREACH, etc.).
-    :ftp_ignore_failing_connections => true # optional, false by default
+  # Optional flag to skip dead servers.
+  # If set to true and the connection to a particular server cannot be
+  # established, the connection error will be ignored and the files will
+  # not be uploaded to that server.
+  # If set to false and the connection to a particular server cannot be established,
+  # a SystemCallError will be raised (Errno::ETIMEDOUT, Errno::ENETUNREACH, etc.).
+  :ftp_ignore_failing_connections => true # optional, false by default
 end
 ```
 
