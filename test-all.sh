@@ -14,13 +14,13 @@ else
   printf "ERROR: An RVM installation was not found.\n"
 fi
 
-for ruby in '1.9.3' '2.1' 'jruby --1.9' 'rbx'
+for ruby in '2.1' '2.2' 'jruby --1.9' 'rbx'
 do
   rvm try_install $ruby
   rvm use $ruby
   gem install bundler --conservative --no-rdoc --no-ri
 
-  for paperclip_version in 2 3 4
+  for paperclip_version in 4
   do
     gemfile="gemfiles/Gemfile.paperclip-${paperclip_version}.x"
     bundle install --gemfile=$gemfile
