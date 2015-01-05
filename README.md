@@ -37,8 +37,7 @@ In your model:
 
 ```ruby
 class User < ActiveRecord::Base
-  has_attached_file :avatar,
-
+  has_attached_file :avatar, {
     # Choose the FTP storage backend
     :storage => :ftp,
 
@@ -79,6 +78,7 @@ class User < ActiveRecord::Base
     # If set to false and the connection to a particular server cannot be established,
     # a SystemCallError will be raised (Errno::ETIMEDOUT, Errno::ENETUNREACH, etc.).
     :ftp_ignore_failing_connections => true # optional, false by default
+  }
 end
 ```
 
