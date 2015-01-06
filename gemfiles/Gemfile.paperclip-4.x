@@ -10,8 +10,3 @@ group :test do
 
   gem "coveralls", :require => false, :platforms => :ruby
 end
-
-platforms :rbx do
-  gem 'rubysl', '~> 2.0'
-  gem 'json'
-end
