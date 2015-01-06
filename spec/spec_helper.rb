@@ -1,9 +1,7 @@
-require "simplecov"
-require "coveralls"
-
-SimpleCov.formatter = Coveralls::SimpleCov::Formatter
-SimpleCov.start do
-  add_filter "spec"
+begin
+  require "coveralls"
+  Coveralls.wear!
+rescue LoadError
 end
 
 RSpec.configure do |config|
