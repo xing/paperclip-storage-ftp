@@ -80,6 +80,17 @@ describe Paperclip::Storage::Ftp do
   end
 
   context "#flush_writes" do
+    it "doesn't connect to the servers if there is nothing to write" do
+      attachment.instance_variable_set(:@queued_for_write, {})
+
+      attachment.should_not_receive(:with_ftp_servers)
+      attachment.should_receive(:after_flush_writes).with(no_args)
+
+      attachment.flush_writes
+
+      attachment.queued_for_write.should == {}
+    end
+
     it "stores the files on every server" do
       original_file = double("original_file", :path => "/tmp/original/foo.jpg")
       thumb_file    = double("thumb_file",    :path => "/tmp/thumb/foo.jpg")
@@ -105,6 +116,16 @@ describe Paperclip::Storage::Ftp do
   end
 
   context "#flush_deletes" do
+    it "doesn't connect to the servers if there is nothing to delete" do
+      attachment.instance_variable_set(:@queued_for_delete, [])
+
+      attachment.should_not_receive(:with_ftp_servers)
+
+      attachment.flush_deletes
+
+      attachment.instance_variable_get(:@queued_for_delete).should == []
+    end
+
     it "deletes the files on every server" do
       attachment.instance_variable_set(:@queued_for_delete, [
         "/files/original/foo.jpg",

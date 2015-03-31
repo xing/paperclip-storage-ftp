@@ -35,16 +35,18 @@ module Paperclip
       end
 
       def flush_writes
-        with_ftp_servers do |servers|
-          servers.map do |server|
-            Thread.new do
-              @queued_for_write.each do |style_name, file|
-                remote_path = path(style_name)
-                log("saving ftp://#{server.user}@#{server.host}:#{remote_path}")
-                server.put_file(file.path, remote_path)
+        unless @queued_for_write.empty?
+          with_ftp_servers do |servers|
+            servers.map do |server|
+              Thread.new do
+                @queued_for_write.each do |style_name, file|
+                  remote_path = path(style_name)
+                  log("saving ftp://#{server.user}@#{server.host}:#{remote_path}")
+                  server.put_file(file.path, remote_path)
+                end
               end
-            end
-          end.each(&:join)
+            end.each(&:join)
+          end
         end
 
         after_flush_writes # allows attachment to clean up temp files
@@ -53,18 +55,20 @@ module Paperclip
       end
 
       def flush_deletes
-        with_ftp_servers do |servers|
-          servers.map do |server|
-            Thread.new do
-              @queued_for_delete.each do |path|
-                log("deleting ftp://#{server.user}@#{server.host}:#{path}")
-                server.delete_file(path)
+        unless @queued_for_delete.empty?
+          with_ftp_servers do |servers|
+            servers.map do |server|
+              Thread.new do
+                @queued_for_delete.each do |path|
+                  log("deleting ftp://#{server.user}@#{server.host}:#{path}")
+                  server.delete_file(path)
 
-                log("deleting empty parent directories ftp://#{server.user}@#{server.host}:#{path}")
-                server.rmdir_p(File.dirname(path))
+                  log("deleting empty parent directories ftp://#{server.user}@#{server.host}:#{path}")
+                  server.rmdir_p(File.dirname(path))
+                end
               end
-            end
-          end.each(&:join)
+            end.each(&:join)
+          end
         end
 
         @queued_for_delete = []
