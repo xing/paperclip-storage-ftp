@@ -1,5 +1,7 @@
 require "active_record"
 
+ActiveRecord::Base.raise_in_transactional_callbacks = true
+
 ActiveRecord::Base.establish_connection(
   :adapter  => "sqlite3",
   :database => ":memory:"
@@ -13,6 +15,8 @@ ActiveRecord::Schema.define do
   add_column :users, :avatar_file_size, :integer
   add_column :users, :avatar_updated_at, :datetime
 end
+
+
 
 class UserBase < ActiveRecord::Base
   include Paperclip::Glue
