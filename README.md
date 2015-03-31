@@ -84,6 +84,10 @@ end
 
 ## Changelog
 
+### 1.2.4
+
+* Avoid unnecessary connection to server(s) when there are no files to be written or deleted [#26](https://github.com/xing/paperclip-storage-ftp/pull/26)
+
 ### 1.2.3
 
 * Rescue FTPPermError exception during `file_exists?` [#22](https://github.com/xing/paperclip-storage-ftp/pull/22)
@@ -124,7 +128,7 @@ Mostly performance enhancements
 
 You can find out more about our work on our [dev blog](http://devblog.xing.com).
 
-Copyright (c) 2014 [XING AG](http://www.xing.com)
+Copyright (c) 2015 [XING AG](http://www.xing.com)
 
 Released under the MIT license. For full details see [LICENSE](https://github.com/xing/paperclip-storage-ftp/blob/master/LICENSE)
 included in this distribution.
