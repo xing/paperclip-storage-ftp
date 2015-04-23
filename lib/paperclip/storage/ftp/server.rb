@@ -60,7 +60,8 @@ module Paperclip
 
         def put_file(local_file_path, remote_file_path)
           pathname = Pathname.new(remote_file_path)
-          mkdir_p(pathname.dirname.to_s)
+          directory = pathname.dirname.to_s
+          mkdir_p(directory) unless file_exists?(directory)
           connection.putbinaryfile(local_file_path, remote_file_path)
         end
 

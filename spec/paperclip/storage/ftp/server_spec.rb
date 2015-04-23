@@ -70,10 +70,21 @@ describe Paperclip::Storage::Ftp::Server do
       server.stub(:connection).and_return(double("connection"))
     end
 
-    it "stores the file on the server" do
-      server.should_receive(:mkdir_p).with("/files")
-      server.connection.should_receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
-      server.put_file("/tmp/original.jpg", "/files/original.jpg")
+    context "directory present" do
+      it "stores the file on the server" do
+        server.should_receive(:file_exists?).with("/files").and_return(true)
+        server.connection.should_receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
+        server.put_file("/tmp/original.jpg", "/files/original.jpg")
+      end
+    end
+
+    context "directory missing" do
+      it "creates necessary directories and stores the file on the server" do
+        server.should_receive(:file_exists?).with("/files").and_return(false)
+        server.should_receive(:mkdir_p).with("/files")
+        server.connection.should_receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
+        server.put_file("/tmp/original.jpg", "/files/original.jpg")
+      end
     end
   end
 
