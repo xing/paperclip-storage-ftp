@@ -2,6 +2,7 @@ require "spec_helper"
 
 describe Paperclip::Storage::Ftp::Server do
   let(:server) { Paperclip::Storage::Ftp::Server.new }
+  let(:connection) { double("connection") }
 
   context "initialize" do
     it "accepts options to initialize attributes" do
@@ -25,7 +26,7 @@ describe Paperclip::Storage::Ftp::Server do
 
   context "#file_exists?" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "returns true if the file exists on the server" do
@@ -56,7 +57,7 @@ describe Paperclip::Storage::Ftp::Server do
 
   context "#get_file" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "returns the file object" do
@@ -67,7 +68,7 @@ describe Paperclip::Storage::Ftp::Server do
 
   context "#put_file" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     context "directory present" do
@@ -88,9 +89,100 @@ describe Paperclip::Storage::Ftp::Server do
     end
   end
 
+  context "#put_files" do
+    before do
+      server.stub(:connection).and_return(connection)
+    end
+
+    shared_examples "proper handling" do
+      it "passes files to #put_file" do
+        server.should_receive(:mktree).with(tree)
+        connection.should_receive(:chdir).with("/")
+        server.should_receive(:put_file).with(files.keys.first, files.values.first).ordered
+        server.should_receive(:put_file).with(files.keys.last, files.values.last).ordered
+        server.put_files files
+      end
+    end
+
+    context "common directories" do
+      let(:files) do
+        {
+          "/tmp/foo1.jpg" => "/bar/foo1.jpg",
+          "/tmp/foo2.jpg" => "/bar/foo2.jpg"
+        }
+      end
+      let(:tree) { { "bar"=>{} } }
+
+      include_examples "proper handling"
+    end
+
+    context "no common directories" do
+      let(:files) do
+        {
+          "/tmp/foo1.jpg" => "/bar/foo1.jpg",
+          "/tmp/foo2.jpg" => "/baz/foo2.jpg"
+        }
+      end
+      let(:tree) { { "bar"=>{}, "baz"=>{} } }
+
+      include_examples "proper handling"
+    end
+  end
+
+  context "#directory_tree" do
+    let(:files) {
+      %w(/foo/bar1.jpg /foo/bar2.jpg /foo/bar/baz.jpg /foo/foo/bar.jpg /foobar/foobar.jpg /root.jpg)
+    }
+
+    it "handles empty file list" do
+      expect(server.directory_tree([])).to eq({})
+    end
+
+    it "extracts nested directory structure" do
+      expect(server.directory_tree(files)).to eq(
+        {
+          "foo" => {
+            "bar" => {},
+            "foo" => {}
+          },
+          "foobar"=>{}
+        }
+      )
+    end
+  end
+
+  context "#mktree" do
+    before do
+      server.stub(:connection).and_return(connection)
+    end
+    let(:tree) do
+      {"foo"=>{
+         "bar"=>{},
+         "baz"=>{"qux"=>{}}},
+       "foobar"=>{}
+      }
+    end
+
+    it "handles empty tree" do
+      server.mktree({})
+    end
+
+    it "works for nested tree" do
+      connection.should_receive(:chdir).with("/").ordered
+      connection.should_receive(:mkdir).with("foo").ordered
+      connection.should_receive(:mkdir).with("foobar").ordered
+      connection.should_receive(:chdir).with("/foo/").ordered
+      connection.should_receive(:mkdir).with("bar").ordered
+      connection.should_receive(:mkdir).with("baz").ordered
+      connection.should_receive(:chdir).with("/foo/baz/").ordered
+      connection.should_receive(:mkdir).with("qux").ordered
+      server.mktree(tree)
+    end
+  end
+
   context "#delete_file" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "deletes the file on the server" do
@@ -101,7 +193,7 @@ describe Paperclip::Storage::Ftp::Server do
 
   context "#rmdir_p" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "deletes the directory and all parent directories" do
@@ -127,7 +219,7 @@ describe Paperclip::Storage::Ftp::Server do
 
   context "mkdir_p" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "creates the directory and all its parent directories" do

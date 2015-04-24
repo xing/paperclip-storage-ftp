@@ -65,6 +65,26 @@ module Paperclip
           connection.putbinaryfile(local_file_path, remote_file_path)
         end
 
+        def put_files(file_paths)
+          tree = directory_tree(file_paths.values)
+          mktree(tree)
+          connection.chdir("/")
+          file_paths.each do |local_file_path, remote_file_path|
+            put_file(local_file_path, remote_file_path)
+          end
+        end
+
+        def directory_tree(file_paths)
+          directories = file_paths.map do |path|
+            Pathname.new(path).dirname.to_s.split("/").reject(&:empty?)
+          end
+          tree = Hash.new {|h, k| h[k] = Hash.new(&h.default_proc)}
+          directories.each do |directory|
+            directory.inject(tree){|h,k| h[k]}
+          end
+          tree
+        end
+
         def delete_file(remote_file_path)
           connection.delete(remote_file_path)
         end
@@ -87,6 +107,20 @@ module Paperclip
               # This error can be caused by an existing directory.
               # Ignore, and keep on trying to create child directories.
             end
+          end
+        end
+
+        def mktree(tree, chdir="/")
+          return unless tree.any?
+          connection.chdir(chdir)
+          tree.each do |directory, sub_directories|
+            begin
+              connection.mkdir(directory)
+            rescue Net::FTPPermError
+            end
+          end
+          tree.each do |directory, sub_directories|
+            mktree(sub_directories, chdir + directory + "/")
           end
         end
 
