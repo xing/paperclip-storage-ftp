@@ -16,6 +16,7 @@ RSpec.configure do |config|
   end
 end
 
+require "byebug" unless RUBY_PLATFORM =~ /java/
 require "paperclip/storage/ftp"
 
 Paperclip.options[:log] = false

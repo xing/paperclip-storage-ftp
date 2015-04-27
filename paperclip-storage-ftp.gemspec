@@ -20,4 +20,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency("rake")
   gem.add_development_dependency("daemon_controller", ">= 1.1.0")
   gem.add_development_dependency("activerecord")
+  gem.add_development_dependency("byebug") unless RUBY_PLATFORM =~ /java/
 end
