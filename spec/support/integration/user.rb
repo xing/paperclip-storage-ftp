@@ -88,6 +88,20 @@ class UserWithInvalidPort < UserBase
   end
 end
 
+class UserWithOneServerAndDeepPath < UserBase
+  setup_avatar_attachment(avatar_options.merge(
+    :path     => "/img/:class/:attachment/:id_partition/:style/:filename",
+    :ftp_servers => [
+      {
+        :host     => "127.0.0.1",
+        :user     => "user1",
+        :password => "secret1",
+        :port     => 2121
+      }
+    ]
+  ))
+end
+
 class UserIgnoringFailingConnection < UserWithInvalidPort
   setup_avatar_attachment(avatar_options.merge(
     :ftp_ignore_failing_connections => true

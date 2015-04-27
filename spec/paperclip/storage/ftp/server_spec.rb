@@ -143,7 +143,7 @@ describe Paperclip::Storage::Ftp::Server do
 
       it "skips creation of directory tree" do
         expect(server).to_not receive(:mktree)
-        expect(server).to receive(:put_file).with(files.first.first, files.first.last).once
+        expect(server).to receive(:put_file).with(files.first.first, files.first.last, true).once
         server.put_files(files)
       end
     end

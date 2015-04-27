@@ -69,11 +69,10 @@ module Paperclip
           if file_paths.length > 1
             tree = directory_tree(file_paths.values)
             mktree(tree)
-            file_paths.each do |local_file_path, remote_file_path|
-              put_file(local_file_path, remote_file_path, false)
-            end
-          elsif file_paths.length == 1
-            put_file(file_paths.first.first, file_paths.first.last)
+          end
+
+          file_paths.each do |local_file_path, remote_file_path|
+            put_file(local_file_path, remote_file_path, file_paths.length == 1)
           end
         end
 
