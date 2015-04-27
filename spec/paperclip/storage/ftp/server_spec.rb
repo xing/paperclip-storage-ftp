@@ -87,6 +87,15 @@ describe Paperclip::Storage::Ftp::Server do
         server.put_file("/tmp/original.jpg", "/files/original.jpg")
       end
     end
+
+    context "skip existence check" do
+      it "considers check_existence flag" do
+        expect(server).to_not receive(:file_exists?)
+        expect(server).to_not receive(:mkdir_p).with("/files")
+        expect(server.connection).to receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
+        server.put_file("/tmp/original.jpg", "/files/original.jpg", false)
+      end
+    end
   end
 
   context "#put_files" do
@@ -97,8 +106,8 @@ describe Paperclip::Storage::Ftp::Server do
     shared_examples "proper handling" do
       it "passes files to #put_file" do
         server.should_receive(:mktree).with(tree)
-        server.should_receive(:put_file).with(files.keys.first, files.values.first).ordered
-        server.should_receive(:put_file).with(files.keys.last, files.values.last).ordered
+        server.should_receive(:put_file).with(files.keys.first, files.values.first, false).ordered
+        server.should_receive(:put_file).with(files.keys.last, files.values.last, false).ordered
         server.put_files files
       end
     end
@@ -125,6 +134,18 @@ describe Paperclip::Storage::Ftp::Server do
       let(:tree) { { "bar"=>{}, "baz"=>{} } }
 
       include_examples "proper handling"
+    end
+
+    context "only one file" do
+      let(:files) do
+        { "/tmp/foo1.jpg" => "/bar/foo1.jpg" }
+      end
+
+      it "skips creation of directory tree" do
+        expect(server).to_not receive(:mktree)
+        expect(server).to receive(:put_file).with(files.first.first, files.first.last).once
+        server.put_files(files)
+      end
     end
   end
 

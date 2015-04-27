@@ -58,18 +58,22 @@ module Paperclip
           connection.getbinaryfile(remote_file_path, local_file_path)
         end
 
-        def put_file(local_file_path, remote_file_path)
+        def put_file(local_file_path, remote_file_path, check_existence = true)
           pathname = Pathname.new(remote_file_path)
           directory = pathname.dirname.to_s
-          mkdir_p(directory) unless file_exists?(directory)
+          mkdir_p(directory) if check_existence && !file_exists?(directory)
           connection.putbinaryfile(local_file_path, remote_file_path)
         end
 
         def put_files(file_paths)
-          tree = directory_tree(file_paths.values)
-          mktree(tree)
-          file_paths.each do |local_file_path, remote_file_path|
-            put_file(local_file_path, remote_file_path)
+          if file_paths.length > 1
+            tree = directory_tree(file_paths.values)
+            mktree(tree)
+            file_paths.each do |local_file_path, remote_file_path|
+              put_file(local_file_path, remote_file_path, false)
+            end
+          elsif file_paths.length == 1
+            put_file(file_paths.first.first, file_paths.first.last)
           end
         end
 

@@ -39,11 +39,14 @@ module Paperclip
           with_ftp_servers do |servers|
             servers.map do |server|
               Thread.new do
+                write_queue = {}
                 @queued_for_write.each do |style_name, file|
                   remote_path = path(style_name)
                   log("saving ftp://#{server.user}@#{server.host}:#{remote_path}")
-                  server.put_file(file.path, remote_path)
+                  write_queue[file.path] = remote_path
                 end
+
+                server.put_files(write_queue)
               end
             end.each(&:join)
           end
