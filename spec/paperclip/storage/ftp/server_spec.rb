@@ -97,7 +97,6 @@ describe Paperclip::Storage::Ftp::Server do
     shared_examples "proper handling" do
       it "passes files to #put_file" do
         server.should_receive(:mktree).with(tree)
-        connection.should_receive(:chdir).with("/")
         server.should_receive(:put_file).with(files.keys.first, files.values.first).ordered
         server.should_receive(:put_file).with(files.keys.last, files.values.last).ordered
         server.put_files files
@@ -156,10 +155,11 @@ describe Paperclip::Storage::Ftp::Server do
       server.stub(:connection).and_return(connection)
     end
     let(:tree) do
-      {"foo"=>{
-         "bar"=>{},
-         "baz"=>{"qux"=>{}}},
-       "foobar"=>{}
+      {
+        "foo"=>{
+          "bar"=>{},
+          "baz"=>{"qux"=>{}}},
+        "foobar"=>{}
       }
     end
 
@@ -167,16 +167,47 @@ describe Paperclip::Storage::Ftp::Server do
       server.mktree({})
     end
 
-    it "works for nested tree" do
-      connection.should_receive(:chdir).with("/").ordered
-      connection.should_receive(:mkdir).with("foo").ordered
-      connection.should_receive(:mkdir).with("foobar").ordered
-      connection.should_receive(:chdir).with("/foo/").ordered
-      connection.should_receive(:mkdir).with("bar").ordered
-      connection.should_receive(:mkdir).with("baz").ordered
-      connection.should_receive(:chdir).with("/foo/baz/").ordered
-      connection.should_receive(:mkdir).with("qux").ordered
-      server.mktree(tree)
+    context "empty ftp tree" do
+      it "creates entire nested tree" do
+        connection.should_receive(:nlst).with("/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/foo").ordered
+        connection.should_receive(:mkdir).with("/foobar").ordered
+        connection.should_receive(:nlst).with("/foo/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/foo/bar").ordered
+        connection.should_receive(:mkdir).with("/foo/baz").ordered
+        connection.should_receive(:nlst).with("/foo/baz/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/foo/baz/qux").ordered
+        server.mktree(tree)
+      end
+    end
+
+    context "partially existent ftp tree" do
+      it "creates only the missing directories" do
+        connection.should_receive(:nlst).with("/").ordered.and_return(["foo"])
+        connection.should_receive(:mkdir).with("/foobar").ordered
+        connection.should_receive(:nlst).with("/foo/").ordered.and_return(["baz"])
+        connection.should_receive(:mkdir).with("/foo/bar").ordered
+        connection.should_receive(:nlst).with("/foo/baz/").ordered.and_return(["qux"])
+        server.mktree(tree)
+      end
+    end
+
+    context "intermittent creation of directories" do
+      let(:tree) do
+        {
+          "foo"=>{},
+          "bar"=>{"foobar"=>{}}
+        }
+      end
+
+      it "handles Net::FTPPermError" do
+        connection.should_receive(:nlst).with("/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/foo").ordered.and_raise(Net::FTPPermError)
+        connection.should_receive(:mkdir).with("/bar").ordered.and_raise(Net::FTPPermError)
+        connection.should_receive(:nlst).with("/bar/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/bar/foobar").ordered.and_raise(Net::FTPPermError)
+        server.mktree(tree)
+      end
     end
   end
 

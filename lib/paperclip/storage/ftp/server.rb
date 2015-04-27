@@ -68,7 +68,6 @@ module Paperclip
         def put_files(file_paths)
           tree = directory_tree(file_paths.values)
           mktree(tree)
-          connection.chdir("/")
           file_paths.each do |local_file_path, remote_file_path|
             put_file(local_file_path, remote_file_path)
           end
@@ -110,17 +109,19 @@ module Paperclip
           end
         end
 
-        def mktree(tree, chdir="/")
+        def mktree(tree, base = "/")
           return unless tree.any?
-          connection.chdir(chdir)
-          tree.each do |directory, sub_directories|
+          list = connection.nlst(base)
+          tree.reject{|k,_| list.include?(k)}.each do |directory, sub_directories|
             begin
-              connection.mkdir(directory)
+              connection.mkdir(base + directory)
             rescue Net::FTPPermError
+              # This error can be caused by an already existing directory,
+              # maybe it was created in the meantime.
             end
           end
           tree.each do |directory, sub_directories|
-            mktree(sub_directories, chdir + directory + "/")
+            mktree(sub_directories, base + directory + "/")
           end
         end
 
