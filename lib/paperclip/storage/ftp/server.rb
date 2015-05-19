@@ -1,5 +1,6 @@
 require "pathname"
 require "net/ftp"
+require "timeout"
 
 module Paperclip
   module Storage
@@ -22,12 +23,11 @@ module Paperclip
         def establish_connection
           @connection = Net::FTP.new
           @connection.passive = passive
-          @connection.open_timeout = connect_timeout
 
           if ignore_connect_errors
             begin
               connect
-            rescue Net::OpenTimeout, SystemCallError => e
+            rescue SystemCallError => e
               Paperclip.log("could not connect to ftp://#{user}@#{host}:#{port} (#{e})")
               @connection = nil
               return
@@ -92,7 +92,13 @@ module Paperclip
         private
 
         def connect
-          @connection.connect(host, port)
+          if connect_timeout
+            Timeout.timeout(connect_timeout, Errno::ETIMEDOUT) do
+              @connection.connect(host, port)
+            end
+          else
+            @connection.connect(host, port)
+          end
         end
       end
     end

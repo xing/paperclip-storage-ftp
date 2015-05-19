@@ -76,7 +76,7 @@ class User < ActiveRecord::Base
     # established, the connection error will be ignored and the files will
     # not be uploaded to that server.
     # If set to false and the connection to a particular server cannot be established,
-    # either a Net::OpenTimeout or a SystemCallError will be raised (Errno::ENETUNREACH, etc.).
+    # a SystemCallError will be raised (Errno::ETIMEDOUT, Errno::ENETUNREACH, etc.).
     :ftp_ignore_failing_connections => true # optional, false by default
   }
 end
