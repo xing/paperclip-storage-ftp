@@ -122,7 +122,7 @@ describe "paperclip-storage-ftp", :integration => true do
       # for the Errno::ETIMEDOUT raised by the OS (usually in the
       # seconds or minutes range)
       Timeout.timeout(UserWithConnectTimeout::TIMEOUT + 1) do
-        expect { user.save! }.to raise_error(Errno::ETIMEDOUT)
+        expect { user.save! }.to raise_error(Net::OpenTimeout)
       end
     end
   end

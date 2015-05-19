@@ -107,6 +107,7 @@ describe Paperclip::Storage::Ftp::Server do
       ftp = double("ftp")
       Net::FTP.should_receive(:new).and_return(ftp)
       ftp.should_receive(:passive=).with(server.passive)
+      ftp.should_receive(:open_timeout=).with(server.connect_timeout)
       ftp.should_receive(:connect).with(server.host, server.port)
       ftp.should_receive(:login).with(server.user, server.password)
       server.establish_connection
