@@ -71,30 +71,9 @@ describe Paperclip::Storage::Ftp::Server do
       server.stub(:connection).and_return(connection)
     end
 
-    context "directory present" do
-      it "stores the file on the server" do
-        server.should_receive(:file_exists?).with("/files").and_return(true)
-        server.connection.should_receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
-        server.put_file("/tmp/original.jpg", "/files/original.jpg")
-      end
-    end
-
-    context "directory missing" do
-      it "creates necessary directories and stores the file on the server" do
-        server.should_receive(:file_exists?).with("/files").and_return(false)
-        server.should_receive(:mkdir_p).with("/files")
-        server.connection.should_receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
-        server.put_file("/tmp/original.jpg", "/files/original.jpg")
-      end
-    end
-
-    context "skip existence check" do
-      it "considers check_existence flag" do
-        expect(server).to_not receive(:file_exists?)
-        expect(server).to_not receive(:mkdir_p).with("/files")
-        expect(server.connection).to receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
-        server.put_file("/tmp/original.jpg", "/files/original.jpg", false)
-      end
+    it "stores the file on the server" do
+      server.connection.should_receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
+      server.put_file("/tmp/original.jpg", "/files/original.jpg")
     end
   end
 
@@ -106,8 +85,8 @@ describe Paperclip::Storage::Ftp::Server do
     shared_examples "proper handling" do
       it "passes files to #put_file" do
         server.should_receive(:mktree).with(tree)
-        server.should_receive(:put_file).with(files.keys.first, files.values.first, false).ordered
-        server.should_receive(:put_file).with(files.keys.last, files.values.last, false).ordered
+        server.should_receive(:put_file).with(files.keys.first, files.values.first).ordered
+        server.should_receive(:put_file).with(files.keys.last, files.values.last).ordered
         server.put_files files
       end
     end
@@ -136,15 +115,26 @@ describe Paperclip::Storage::Ftp::Server do
       include_examples "proper handling"
     end
 
-    context "only one file" do
+    context "exactly one file" do
       let(:files) do
         { "/tmp/foo1.jpg" => "/bar/foo1.jpg" }
       end
+      let(:tree) { { "bar"=>{} } }
 
-      it "skips creation of directory tree" do
-        expect(server).to_not receive(:mktree)
-        expect(server).to receive(:put_file).with(files.first.first, files.first.last, true).once
-        server.put_files(files)
+      it "passes file to #put_file" do
+        server.should_receive(:mktree).with(tree)
+        server.should_receive(:put_file).with(files.keys.first, files.values.first)
+        server.put_files files
+      end
+    end
+
+    context "no files" do
+      let(:files) { {} }
+
+      it "does not to anything" do
+        server.should_not_receive(:put_file)
+        connection.should_not_receive(:mkdir)
+        server.put_files files
       end
     end
   end
@@ -266,26 +256,6 @@ describe Paperclip::Storage::Ftp::Server do
       ftp.should_receive(:login).with(server.user, server.password)
       server.establish_connection
       server.connection.should == ftp
-    end
-  end
-
-  context "mkdir_p" do
-    before do
-      server.stub(:connection).and_return(connection)
-    end
-
-    it "creates the directory and all its parent directories" do
-      server.connection.should_receive(:mkdir).with("/").ordered
-      server.connection.should_receive(:mkdir).with("/files").ordered
-      server.connection.should_receive(:mkdir).with("/files/foo").ordered
-      server.connection.should_receive(:mkdir).with("/files/foo/bar").ordered
-      server.mkdir_p("/files/foo/bar")
-    end
-
-    it "does not stop on Net::FTPPermError" do
-      server.connection.should_receive(:mkdir).with("/").and_raise(Net::FTPPermError)
-      server.connection.should_receive(:mkdir).with("/files")
-      server.mkdir_p("/files")
     end
   end
 end

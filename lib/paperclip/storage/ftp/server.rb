@@ -58,21 +58,17 @@ module Paperclip
           connection.getbinaryfile(remote_file_path, local_file_path)
         end
 
-        def put_file(local_file_path, remote_file_path, check_existence = true)
+        def put_file(local_file_path, remote_file_path)
           pathname = Pathname.new(remote_file_path)
-          directory = pathname.dirname.to_s
-          mkdir_p(directory) if check_existence && !file_exists?(directory)
           connection.putbinaryfile(local_file_path, remote_file_path)
         end
 
         def put_files(file_paths)
-          if file_paths.length > 1
-            tree = directory_tree(file_paths.values)
-            mktree(tree)
-          end
+          tree = directory_tree(file_paths.values)
+          mktree(tree)
 
           file_paths.each do |local_file_path, remote_file_path|
-            put_file(local_file_path, remote_file_path, file_paths.length == 1)
+            put_file(local_file_path, remote_file_path)
           end
         end
 
@@ -98,18 +94,6 @@ module Paperclip
           end
         rescue Net::FTPTempError, Net::FTPPermError
           # Stop trying to remove parent directories
-        end
-
-        def mkdir_p(dirname)
-          pathname = Pathname.new(dirname)
-          pathname.descend do |p|
-            begin
-              connection.mkdir(p.to_s)
-            rescue Net::FTPPermError
-              # This error can be caused by an existing directory.
-              # Ignore, and keep on trying to create child directories.
-            end
-          end
         end
 
         def mktree(tree, base = "/")
