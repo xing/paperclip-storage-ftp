@@ -86,6 +86,12 @@ describe Paperclip::Storage::Ftp::Server do
       server.connection.should_receive(:delete).with("/files/original.jpg")
       server.delete_file("/files/original.jpg")
     end
+
+    it 'rescues from Net::FTPPermError' do
+      server.connection.should_receive(:delete).with('/files/original.jpg')
+        .and_raise Net::FTPPermError
+      expect { server.delete_file('/files/original.jpg') }.to_not raise_error
+    end
   end
 
   context "#rmdir_p" do
