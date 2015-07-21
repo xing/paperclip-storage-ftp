@@ -66,6 +66,8 @@ module Paperclip
 
         def delete_file(remote_file_path)
           connection.delete(remote_file_path)
+        rescue Net::FTPPermError
+          # This happens if the file is already deleted
         end
 
         def rmdir_p(dir_path)
