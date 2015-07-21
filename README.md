@@ -84,6 +84,10 @@ end
 
 ## Changelog
 
+### 1.2.5
+
+* Ignore ftp error when deleting an non-existing file [#29](https://github.com/xing/paperclip-storage-ftp/pull/29)
+
 ### 1.2.4
 
 * Avoid unnecessary connection to server(s) when there are no files to be written or deleted [#26](https://github.com/xing/paperclip-storage-ftp/pull/26)
