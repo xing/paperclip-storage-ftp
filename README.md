@@ -77,7 +77,10 @@ class User < ActiveRecord::Base
     # not be uploaded to that server.
     # If set to false and the connection to a particular server cannot be established,
     # a SystemCallError will be raised (Errno::ETIMEDOUT, Errno::ENETUNREACH, etc.).
-    :ftp_ignore_failing_connections => true # optional, false by default
+    :ftp_ignore_failing_connections => true, # optional, false by default
+
+    # Optional flag to keep empty parent directories when deleting files.
+    :ftp_keep_empty_directories => true # optional, false by default
   }
 end
 ```

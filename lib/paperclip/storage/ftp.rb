@@ -62,7 +62,7 @@ module Paperclip
                 @queued_for_delete.each do |path|
                   log("deleting ftp://#{server.user}@#{server.host}:#{path}")
                   server.delete_file(path)
-
+                  next if @options[:ftp_keep_empty_directories]
                   log("deleting empty parent directories ftp://#{server.user}@#{server.host}:#{path}")
                   server.rmdir_p(File.dirname(path))
                 end

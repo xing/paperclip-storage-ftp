@@ -99,3 +99,9 @@ class UserNotIgnoringFailingConnection < UserWithInvalidPort
     :ftp_ignore_failing_connections => false
   ))
 end
+
+class UserDisablingEmptyDirectoryRemoval < User
+  setup_avatar_attachment(avatar_options.merge(
+    :ftp_keep_empty_directories => true
+  ))
+end
