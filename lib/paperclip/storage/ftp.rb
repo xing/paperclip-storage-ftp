@@ -38,7 +38,7 @@ module Paperclip
         unless @queued_for_write.empty?
           with_ftp_servers do |servers|
             servers.map do |server|
-              Thread.new do
+              run_thread do
                 @queued_for_write.each do |style_name, file|
                   remote_path = path(style_name)
                   log("saving ftp://#{server.user}@#{server.host}:#{remote_path}")
@@ -58,7 +58,7 @@ module Paperclip
         unless @queued_for_delete.empty?
           with_ftp_servers do |servers|
             servers.map do |server|
-              Thread.new do
+              run_thread do
                 @queued_for_delete.each do |path|
                   log("deleting ftp://#{server.user}@#{server.host}:#{path}")
                   server.delete_file(path)
@@ -122,6 +122,22 @@ module Paperclip
         ))
         server.establish_connection
         server
+      end
+
+      private
+
+      if defined?(LogjamAgent)
+        def run_thread(&blk)
+          request = LogjamAgent.request
+          Thread.new do
+            LogjamAgent.request = request
+            blk.call
+          end
+        end
+      else
+        def run_thread(&blk)
+          Thread.new(&blk)
+        end
       end
     end
   end
