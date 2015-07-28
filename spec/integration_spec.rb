@@ -66,6 +66,17 @@ describe "paperclip-storage-ftp", :integration => true do
     Dir.exist?(File.dirname(uploaded_file_server2)).should be false
   end
 
+  it "does not remove empty parent directories if disabled" do
+    user = UserDisablingEmptyDirectoryRemoval.new
+    user.avatar = file
+    user.save!
+
+    user.destroy
+
+    Dir.exist?(File.dirname(uploaded_file_server1)).should be true
+    Dir.exist?(File.dirname(uploaded_file_server2)).should be true
+  end
+
   it "does not remove parent directories which are not empty" do
     user.avatar = file
     user.save!

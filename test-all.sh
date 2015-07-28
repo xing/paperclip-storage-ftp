@@ -14,9 +14,8 @@ else
   printf "ERROR: An RVM installation was not found.\n"
 fi
 
-for ruby in '2.1' '2.2' 'jruby --1.9'
+for ruby in '2.1' '2.2' 'jruby'
 do
-  rvm try_install $ruby
   rvm use $ruby
   gem install bundler --conservative --no-rdoc --no-ri
 

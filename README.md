@@ -77,12 +77,24 @@ class User < ActiveRecord::Base
     # not be uploaded to that server.
     # If set to false and the connection to a particular server cannot be established,
     # a SystemCallError will be raised (Errno::ETIMEDOUT, Errno::ENETUNREACH, etc.).
-    :ftp_ignore_failing_connections => true # optional, false by default
+    :ftp_ignore_failing_connections => true, # optional, false by default
+
+    # Optional flag to keep empty parent directories when deleting files.
+    :ftp_keep_empty_directories => true # optional, false by default
   }
 end
 ```
 
 ## Changelog
+
+### 1.2.6
+
+* New option `:ftp_keep_empty_directories` to disable the removal of empty parent directories when deleting files (introduced in 1.2.2). See usage example above.
+* Fix missing log lines in logjam. This only affects apps that use [logjam_agent](https://github.com/skaes/logjam_agent).
+
+### 1.2.5
+
+* Ignore ftp error when deleting an non-existing file [#29](https://github.com/xing/paperclip-storage-ftp/pull/29)
 
 ### 1.2.4
 
