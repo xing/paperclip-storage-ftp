@@ -8,3 +8,5 @@ gemfile:
 matrix:
   allow_failures:
     - rvm: jruby-19mode
+sudo: false
+cache: bundler
