@@ -60,8 +60,27 @@ module Paperclip
 
         def put_file(local_file_path, remote_file_path)
           pathname = Pathname.new(remote_file_path)
-          mkdir_p(pathname.dirname.to_s)
           connection.putbinaryfile(local_file_path, remote_file_path)
+        end
+
+        def put_files(file_paths)
+          tree = directory_tree(file_paths.values)
+          mktree(tree)
+
+          file_paths.each do |local_file_path, remote_file_path|
+            put_file(local_file_path, remote_file_path)
+          end
+        end
+
+        def directory_tree(file_paths)
+          directories = file_paths.map do |path|
+            Pathname.new(path).dirname.to_s.split("/").reject(&:empty?)
+          end
+          tree = Hash.new {|h, k| h[k] = Hash.new(&h.default_proc)}
+          directories.each do |directory|
+            directory.inject(tree){|h,k| h[k]}
+          end
+          tree
         end
 
         def delete_file(remote_file_path)
@@ -79,15 +98,19 @@ module Paperclip
           # Stop trying to remove parent directories
         end
 
-        def mkdir_p(dirname)
-          pathname = Pathname.new(dirname)
-          pathname.descend do |p|
+        def mktree(tree, base = "/")
+          return unless tree.any?
+          list = connection.nlst(base)
+          tree.reject{|k,_| list.include?(k)}.each do |directory, sub_directories|
             begin
-              connection.mkdir(p.to_s)
+              connection.mkdir(base + directory)
             rescue Net::FTPPermError
-              # This error can be caused by an existing directory.
-              # Ignore, and keep on trying to create child directories.
+              # This error can be caused by an already existing directory,
+              # maybe it was created in the meantime.
             end
+          end
+          tree.each do |directory, sub_directories|
+            mktree(sub_directories, base + directory + "/")
           end
         end
 

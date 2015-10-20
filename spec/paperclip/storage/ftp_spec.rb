@@ -100,10 +100,13 @@ describe Paperclip::Storage::Ftp do
         :thumb    => thumb_file
       })
 
-      first_server.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
-      first_server.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
-      second_server.should_receive(:put_file).with("/tmp/original/foo.jpg", "/files/original/foo.jpg")
-      second_server.should_receive(:put_file).with("/tmp/thumb/foo.jpg", "/files/thumb/foo.jpg")
+      write_queue = {
+        "/tmp/original/foo.jpg" => "/files/original/foo.jpg",
+        "/tmp/thumb/foo.jpg" => "/files/thumb/foo.jpg"
+      }
+
+      first_server.should_receive(:put_files).with(write_queue)
+      second_server.should_receive(:put_files).with(write_queue)
 
       attachment.should_receive(:with_ftp_servers).and_yield([first_server, second_server])
 

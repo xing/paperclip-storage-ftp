@@ -2,6 +2,7 @@ require "spec_helper"
 
 describe Paperclip::Storage::Ftp::Server do
   let(:server) { Paperclip::Storage::Ftp::Server.new }
+  let(:connection) { double("connection") }
 
   context "initialize" do
     it "accepts options to initialize attributes" do
@@ -25,7 +26,7 @@ describe Paperclip::Storage::Ftp::Server do
 
   context "#file_exists?" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "returns true if the file exists on the server" do
@@ -56,7 +57,7 @@ describe Paperclip::Storage::Ftp::Server do
 
   context "#get_file" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "returns the file object" do
@@ -67,19 +68,163 @@ describe Paperclip::Storage::Ftp::Server do
 
   context "#put_file" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "stores the file on the server" do
-      server.should_receive(:mkdir_p).with("/files")
       server.connection.should_receive(:putbinaryfile).with("/tmp/original.jpg", "/files/original.jpg")
       server.put_file("/tmp/original.jpg", "/files/original.jpg")
     end
   end
 
+  context "#put_files" do
+    before do
+      server.stub(:connection).and_return(connection)
+    end
+
+    shared_examples "proper handling" do
+      it "passes files to #put_file" do
+        server.should_receive(:mktree).with(tree)
+        server.should_receive(:put_file).with(files.keys.first, files.values.first).ordered
+        server.should_receive(:put_file).with(files.keys.last, files.values.last).ordered
+        server.put_files files
+      end
+    end
+
+    context "common directories" do
+      let(:files) do
+        {
+          "/tmp/foo1.jpg" => "/bar/foo1.jpg",
+          "/tmp/foo2.jpg" => "/bar/foo2.jpg"
+        }
+      end
+      let(:tree) { { "bar"=>{} } }
+
+      include_examples "proper handling"
+    end
+
+    context "no common directories" do
+      let(:files) do
+        {
+          "/tmp/foo1.jpg" => "/bar/foo1.jpg",
+          "/tmp/foo2.jpg" => "/baz/foo2.jpg"
+        }
+      end
+      let(:tree) { { "bar"=>{}, "baz"=>{} } }
+
+      include_examples "proper handling"
+    end
+
+    context "exactly one file" do
+      let(:files) do
+        { "/tmp/foo1.jpg" => "/bar/foo1.jpg" }
+      end
+      let(:tree) { { "bar"=>{} } }
+
+      it "passes file to #put_file" do
+        server.should_receive(:mktree).with(tree)
+        server.should_receive(:put_file).with(files.keys.first, files.values.first)
+        server.put_files files
+      end
+    end
+
+    context "no files" do
+      let(:files) { {} }
+
+      it "does not to anything" do
+        server.should_not_receive(:put_file)
+        connection.should_not_receive(:mkdir)
+        server.put_files files
+      end
+    end
+  end
+
+  context "#directory_tree" do
+    let(:files) {
+      %w(/foo/bar1.jpg /foo/bar2.jpg /foo/bar/baz.jpg /foo/foo/bar.jpg /foobar/foobar.jpg /root.jpg)
+    }
+
+    it "handles empty file list" do
+      expect(server.directory_tree([])).to eq({})
+    end
+
+    it "extracts nested directory structure" do
+      expect(server.directory_tree(files)).to eq(
+        {
+          "foo" => {
+            "bar" => {},
+            "foo" => {}
+          },
+          "foobar"=>{}
+        }
+      )
+    end
+  end
+
+  context "#mktree" do
+    before do
+      server.stub(:connection).and_return(connection)
+    end
+    let(:tree) do
+      {
+        "foo"=>{
+          "bar"=>{},
+          "baz"=>{"qux"=>{}}},
+        "foobar"=>{}
+      }
+    end
+
+    it "handles empty tree" do
+      server.mktree({})
+    end
+
+    context "empty ftp tree" do
+      it "creates entire nested tree" do
+        connection.should_receive(:nlst).with("/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/foo").ordered
+        connection.should_receive(:mkdir).with("/foobar").ordered
+        connection.should_receive(:nlst).with("/foo/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/foo/bar").ordered
+        connection.should_receive(:mkdir).with("/foo/baz").ordered
+        connection.should_receive(:nlst).with("/foo/baz/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/foo/baz/qux").ordered
+        server.mktree(tree)
+      end
+    end
+
+    context "partially existent ftp tree" do
+      it "creates only the missing directories" do
+        connection.should_receive(:nlst).with("/").ordered.and_return(["foo"])
+        connection.should_receive(:mkdir).with("/foobar").ordered
+        connection.should_receive(:nlst).with("/foo/").ordered.and_return(["baz"])
+        connection.should_receive(:mkdir).with("/foo/bar").ordered
+        connection.should_receive(:nlst).with("/foo/baz/").ordered.and_return(["qux"])
+        server.mktree(tree)
+      end
+    end
+
+    context "intermittent creation of directories" do
+      let(:tree) do
+        {
+          "foo"=>{},
+          "bar"=>{"foobar"=>{}}
+        }
+      end
+
+      it "handles Net::FTPPermError" do
+        connection.should_receive(:nlst).with("/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/foo").ordered.and_raise(Net::FTPPermError)
+        connection.should_receive(:mkdir).with("/bar").ordered.and_raise(Net::FTPPermError)
+        connection.should_receive(:nlst).with("/bar/").ordered.and_return([])
+        connection.should_receive(:mkdir).with("/bar/foobar").ordered.and_raise(Net::FTPPermError)
+        server.mktree(tree)
+      end
+    end
+  end
+
   context "#delete_file" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "deletes the file on the server" do
@@ -96,7 +241,7 @@ describe Paperclip::Storage::Ftp::Server do
 
   context "#rmdir_p" do
     before do
-      server.stub(:connection).and_return(double("connection"))
+      server.stub(:connection).and_return(connection)
     end
 
     it "deletes the directory and all parent directories" do
@@ -117,26 +262,6 @@ describe Paperclip::Storage::Ftp::Server do
       ftp.should_receive(:login).with(server.user, server.password)
       server.establish_connection
       server.connection.should == ftp
-    end
-  end
-
-  context "mkdir_p" do
-    before do
-      server.stub(:connection).and_return(double("connection"))
-    end
-
-    it "creates the directory and all its parent directories" do
-      server.connection.should_receive(:mkdir).with("/").ordered
-      server.connection.should_receive(:mkdir).with("/files").ordered
-      server.connection.should_receive(:mkdir).with("/files/foo").ordered
-      server.connection.should_receive(:mkdir).with("/files/foo/bar").ordered
-      server.mkdir_p("/files/foo/bar")
-    end
-
-    it "does not stop on Net::FTPPermError" do
-      server.connection.should_receive(:mkdir).with("/").and_raise(Net::FTPPermError)
-      server.connection.should_receive(:mkdir).with("/files")
-      server.mkdir_p("/files")
     end
   end
 end

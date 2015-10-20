@@ -137,4 +137,18 @@ describe "paperclip-storage-ftp", :integration => true do
       end
     end
   end
+
+  context "performance" do
+    let(:user) { UserWithOneServerAndDeepPath.new }
+    let(:padded_user_id) { user.id.to_s.rjust(3, "0") }
+    let(:uploaded_file_deep_path) { FtpServer::USER1_PATH + "/img/user_with_one_server_and_deep_paths/avatars/000/000/#{padded_user_id}/original/avatar.jpg" }
+
+    it "triggers minimal amount of ftp commands" do
+      expect_any_instance_of(Net::FTP).to receive(:nlst).exactly(7).times.and_call_original
+      expect_any_instance_of(Net::FTP).to receive(:mkdir).exactly(9).times.and_call_original
+      user.avatar = file
+      user.save!
+      File.exist?(uploaded_file_deep_path).should be true
+    end
+  end
 end
