@@ -87,6 +87,10 @@ end
 
 ## Changelog
 
+### 1.2.7
+
+* Reduce number of FTP commands for creating directories [#27](https://github.com/xing/paperclip-storage-ftp/pull/27)
+
 ### 1.2.6
 
 * New option `:ftp_keep_empty_directories` to disable the removal of empty parent directories when deleting files (introduced in 1.2.2). See usage example above.
