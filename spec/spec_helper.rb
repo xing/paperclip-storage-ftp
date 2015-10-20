@@ -18,7 +18,7 @@ end
 
 require "paperclip/storage/ftp"
 
-Paperclip.options[:log] = true
+Paperclip.options[:log] = false
 
 # https://github.com/thoughtbot/cocaine#caveat
 Cocaine::CommandLine.runner = Cocaine::CommandLine::BackticksRunner.new
