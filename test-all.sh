@@ -17,7 +17,7 @@ else
 fi
 
 # Keep in sync with .travis.yml
-for ruby in '2.2.2' '2.3' '2.4'
+for ruby in '2.2.7' '2.3.4' '2.4.1'
 do
   rvm use $ruby --fuzzy
   gem install bundler --conservative --no-rdoc --no-ri
