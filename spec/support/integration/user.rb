@@ -1,7 +1,5 @@
 require "active_record"
 
-ActiveRecord::Base.raise_in_transactional_callbacks = true
-
 ActiveRecord::Base.establish_connection(
   :adapter  => "sqlite3",
   :database => ":memory:"
