@@ -2,11 +2,11 @@ language: ruby
 rvm:
   - 2.3.4
   - 2.4.1
-  - jruby-19mode
+  - jruby-9.1.5.0
 gemfile:
   - gemfiles/Gemfile.paperclip-4.x
 matrix:
   allow_failures:
-    - rvm: jruby-19mode
+    - rvm: jruby-9.1.5.0
 sudo: false
 cache: bundler
