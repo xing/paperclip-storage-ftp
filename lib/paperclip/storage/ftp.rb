@@ -1,5 +1,5 @@
-require "paperclip"
 require "active_support/all"
+require "paperclip"
 require "tempfile"
 
 require "paperclip/storage/ftp/server"

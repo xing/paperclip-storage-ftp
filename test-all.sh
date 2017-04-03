@@ -3,6 +3,8 @@
 # Run specs against all supported ruby and paperclip versions
 # using RVM (http://rvm.io/)
 
+set -e
+
 # Load RVM into a shell session *as a function*
 if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then
   # First try to load from a user install
@@ -14,14 +16,13 @@ else
   printf "ERROR: An RVM installation was not found.\n"
 fi
 
-for ruby in '2.1' '2.2' 'jruby'
+for ruby in '2.2' '2.3' '2.4'
 do
-  rvm use $ruby
+  rvm use $ruby --fuzzy
   gem install bundler --conservative --no-rdoc --no-ri
 
-  for paperclip_version in 4
+  for gemfile in gemfiles/Gemfile.paperclip-*.x
   do
-    gemfile="gemfiles/Gemfile.paperclip-${paperclip_version}.x"
     bundle install --gemfile=$gemfile
     BUNDLE_GEMFILE=$gemfile bundle exec rake
   done

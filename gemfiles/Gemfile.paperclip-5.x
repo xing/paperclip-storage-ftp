@@ -2,7 +2,7 @@ source "http://rubygems.org"
 
 gemspec :path => '..'
 
-gem "paperclip", "~>4.0"
+gem "paperclip", "~>5.0"
 
 group :test do
   gem "sqlite3"
