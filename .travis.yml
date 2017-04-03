@@ -1,6 +1,7 @@
 language: ruby
+# Keep in sync with test-all.sh
 rvm:
-  - 2.2
+  - 2.2.2
   - 2.3
   - 2.4
 gemfile:

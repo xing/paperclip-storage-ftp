@@ -16,7 +16,8 @@ else
   printf "ERROR: An RVM installation was not found.\n"
 fi
 
-for ruby in '2.2' '2.3' '2.4'
+# Keep in sync with .travis.yml
+for ruby in '2.2.2' '2.3' '2.4'
 do
   rvm use $ruby --fuzzy
   gem install bundler --conservative --no-rdoc --no-ri
