@@ -93,7 +93,8 @@ module Paperclip
       end
 
       def primary_ftp_server
-        @options[:ftp_servers].each do |server_options|
+        servers = find_servers(@options[:ftp_servers])
+        servers.each do |server_options|
           server = build_and_connect_server(server_options)
           return server if server.connected?
         end
@@ -109,8 +110,13 @@ module Paperclip
         end
       end
 
+      def find_servers(servers)
+        servers.respond_to?(:call) ? servers.call(self) : servers
+      end
+
       def ftp_servers
-        servers = @options[:ftp_servers].map do |server_options|
+        servers = find_servers(@options[:ftp_servers])
+        servers = servers.map do |server_options|
           build_and_connect_server(server_options)
         end
         available_servers = servers.select{|s| s.connected? }

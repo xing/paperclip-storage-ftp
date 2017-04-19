@@ -49,7 +49,8 @@ class User < ActiveRecord::Base
     # This supports Paperclip::Interpolations.
     :url => "/url_prefix/:attachment/:id/:style/:filename",
 
-    # The list of FTP servers to use
+    # There are multiple ways to add FTP servers.
+    # 1): Pass the list of FTP servers directly.
     :ftp_servers => [
       {
         :host     => "ftp1.example.com",
@@ -65,6 +66,11 @@ class User < ActiveRecord::Base
         :passive  => true  # optional, false by default
       }
     ],
+
+    # 2): To use credentilas dynamically from database use lamda notation.
+    # ftp_credentials is class method here in which you can access
+    # related association to load credentials from database.
+    ftp_servers: -> (attachment) { attachment.instance.ftp_credentials }
 
     # Optional socket connect timeout (in seconds).
     # This only limits the connection phase, once connected
@@ -82,6 +88,25 @@ class User < ActiveRecord::Base
     # Optional flag to keep empty parent directories when deleting files.
     :ftp_keep_empty_directories => true # optional, false by default
   }
+
+  # If you are using 2nd method to add FTP Servers.
+  def ftp_credentials
+    [
+      {
+        :host     => "ftp1.example.com",
+        :user     => "foo",
+        :password => "bar"
+      },
+      # Add more servers if needed
+      {
+        :host     => "ftp2.example.com",
+        :user     => "foo",
+        :password => "bar",
+        :port     => 2121, # optional, 21 by default
+        :passive  => true  # optional, false by default
+      }
+    ]
+  end
 end
 ```
 
