@@ -111,13 +111,7 @@ module Paperclip
       end
 
       def find_servers(servers)
-        if servers.respond_to?(:call)
-          servers.call(self)
-        elsif servers.is_a? Array
-          servers
-        else
-          raise ArgumentError, "Credentials given are not a Proc or Array."
-        end
+        servers.respond_to?(:call) ? servers.call(self) : servers
       end
 
       def ftp_servers
