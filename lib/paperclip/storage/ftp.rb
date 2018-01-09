@@ -121,7 +121,8 @@ module Paperclip
       def build_and_connect_server(server_options)
         server = Server.new(server_options.merge(
           :connect_timeout       => @options[:ftp_connect_timeout],
-          :ignore_connect_errors => @options[:ftp_ignore_failing_connections]
+          :ignore_connect_errors => @options[:ftp_ignore_failing_connections],
+          :passive               => @options[:ftp_passive]
         ))
         server.establish_connection
         server
