@@ -14,10 +14,12 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = "1.2.7"
 
-  gem.add_dependency("paperclip")
+  gem.add_dependency("paperclip", ">= 4.0.0")
 
   gem.add_development_dependency("rspec")
   gem.add_development_dependency("rake")
   gem.add_development_dependency("daemon_controller", ">= 1.1.0")
   gem.add_development_dependency("activerecord")
+  gem.add_development_dependency("sqlite3")
+  gem.add_development_dependency("coveralls")
 end
