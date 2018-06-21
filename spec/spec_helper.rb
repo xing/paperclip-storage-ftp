@@ -1,5 +1,5 @@
 # Send coveralls report on one job per build only
-ENV["TRAVIS_JOB_NUMBER"].to_s.end_with?(".1")
+if ENV["TRAVIS_JOB_NUMBER"].to_s.end_with?(".1")
   begin
     require "coveralls"
     Coveralls.wear!
