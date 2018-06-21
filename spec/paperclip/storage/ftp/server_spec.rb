@@ -190,6 +190,12 @@ describe Paperclip::Storage::Ftp::Server do
         connection.should_receive(:mkdir).with("/foo/baz/qux").ordered
         server.mktree(tree)
       end
+
+      it "handles possible error on nlst" do
+        connection.should_receive(:nlst).with("/").ordered.and_raise(Net::FTPError)
+        connection.should_receive(:mkdir).with("/foo").ordered
+        server.mktree("foo"=>{})
+      end
     end
 
     context "partially existent ftp tree" do
