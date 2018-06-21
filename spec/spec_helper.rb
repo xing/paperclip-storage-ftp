@@ -1,7 +1,10 @@
-begin
-  require "coveralls"
-  Coveralls.wear!
-rescue LoadError
+# Send coveralls report on one job per build only
+ENV["TRAVIS_JOB_NUMBER"].to_s.end_with?(".1")
+  begin
+    require "coveralls"
+    Coveralls.wear!
+  rescue LoadError
+  end
 end
 
 RSpec.configure do |config|
