@@ -87,6 +87,10 @@ end
 
 ## Changelog
 
+### 1.2.8
+
+* Handle possible ftp error when uploading to empty remote dir [#28](https://github.com/xing/paperclip-storage-ftp/pull/28)
+
 ### 1.2.7
 
 * Reduce number of FTP commands for creating directories [#27](https://github.com/xing/paperclip-storage-ftp/pull/27)
