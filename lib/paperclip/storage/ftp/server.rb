@@ -100,8 +100,15 @@ module Paperclip
 
         def mktree(tree, base = "/")
           return unless tree.any?
-          list = connection.nlst(base)
-          tree.reject{|k,_| list.include?(k)}.each do |directory, sub_directories|
+
+          existing_files =
+            begin
+              connection.nlst(base)
+            rescue Net::FTPError
+              []
+            end
+
+          tree.reject{|k,_| existing_files.include?(k)}.each do |directory, sub_directories|
             begin
               connection.mkdir(base + directory)
             rescue Net::FTPPermError
@@ -109,6 +116,7 @@ module Paperclip
               # maybe it was created in the meantime.
             end
           end
+
           tree.each do |directory, sub_directories|
             mktree(sub_directories, base + directory + "/")
           end
